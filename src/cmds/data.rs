@@ -29,6 +29,17 @@ impl Command for DataCommand {
 
     fn handler(m: &ArgMatches) -> Result<(), Error> {
         log::info!("handling...");
+
+        if m.contains_id("download") {
+            let equity = if m.contains_id("download") {
+                Some(m.get_one::<String>("download"))
+            } else {
+                None
+            };
+
+            log::info!("you want to download {:?}", equity)
+        }
+
         Ok(())
     }
 
