@@ -10,11 +10,11 @@ impl Command for DataCommand {
             .about("Manage equity data")
             .visible_alias("d")
             .arg(
-                Arg::new("delete")
+                Arg::new("download")
                     .display_order(1)
                     .short('d')
-                    .long("delete")
-                    .help("Delete cache")
+                    .long("download")
+                    .help("Download data")
                     .action(ArgAction::SetTrue),
             )
             .arg(
@@ -22,7 +22,7 @@ impl Command for DataCommand {
                     .display_order(2)
                     .short('u')
                     .long("update")
-                    .help("Update cache")
+                    .help("Update data")
                     .action(ArgAction::SetTrue),
             )
     }
