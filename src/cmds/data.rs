@@ -32,14 +32,14 @@ impl Command for DataCommand {
 
         if m.contains_id("download") {
             match m.get_one::<String>("download").map(String::as_str){
-                Some(equity) => log::info!("you want to download {:?}", equity),
+                Some(equity) => log::info!("Downloading {:?}...", equity),
                 None => (),
             }
         }
 
         if m.contains_id("update") {
             match m.get_one::<String>("update").map(String::as_str){
-                Some(equity) => log::info!("you want to update {:?}", equity),
+                Some(equity) => log::info!("Updating {:?}...", equity),
                 None => (),
             }
         }
