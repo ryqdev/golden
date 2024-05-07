@@ -9,5 +9,7 @@ pub trait Command {
 
 
 mod data;
+mod backtest;
 
 pub use data::DataCommand;
+pub use backtest::BackTestCommand;
