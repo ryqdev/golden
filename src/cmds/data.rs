@@ -15,7 +15,7 @@ impl Command for DataCommand {
                     .short('d')
                     .long("download")
                     .help("Download data")
-                    .action(ArgAction::SetTrue),
+                    .action(ArgAction::Set),
             )
             .arg(
                 Arg::new("update")
@@ -23,7 +23,7 @@ impl Command for DataCommand {
                     .short('u')
                     .long("update")
                     .help("Update data")
-                    .action(ArgAction::SetTrue),
+                    .action(ArgAction::Set),
             )
     }
 
@@ -31,13 +31,17 @@ impl Command for DataCommand {
         log::info!("handling...");
 
         if m.contains_id("download") {
-            let equity = if m.contains_id("download") {
-                Some(m.get_one::<String>("download"))
-            } else {
-                None
-            };
+            match m.get_one::<String>("download").map(String::as_str){
+                Some(equity) => log::info!("you want to download {:?}", equity),
+                None => (),
+            }
+        }
 
-            log::info!("you want to download {:?}", equity)
+        if m.contains_id("update") {
+            match m.get_one::<String>("update").map(String::as_str){
+                Some(equity) => log::info!("you want to update {:?}", equity),
+                None => (),
+            }
         }
 
         Ok(())
