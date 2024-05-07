@@ -15,14 +15,13 @@ fn main() -> Result<(),Error> {
         .subcommands(vec![
             DataCommand::usage().display_order(1),
         ]);
-    let m = cmd.clone().get_matches();
 
     env_logger::Builder::new()
         .filter_level(LevelFilter::Info)
         .format_timestamp(None)
         .init();
 
-    match m.subcommand() {
+    match cmd.get_matches().subcommand() {
         Some(("data", sub_m)) => Ok(DataCommand::handler(sub_m)?),
         _ => Err(Error::msg("match error!!!")),
     }
