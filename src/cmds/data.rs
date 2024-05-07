@@ -28,23 +28,19 @@ impl Command for DataCommand {
     }
 
     fn handler(m: &ArgMatches) -> Result<(), Error> {
-        log::info!("handling...");
-
+        log::info!("handle data command");
         if m.contains_id("download") {
             match m.get_one::<String>("download").map(String::as_str){
                 Some(equity) => log::info!("Downloading {:?}...", equity),
                 None => (),
             }
         }
-
         if m.contains_id("update") {
             match m.get_one::<String>("update").map(String::as_str){
                 Some(equity) => log::info!("Updating {:?}...", equity),
                 None => (),
             }
         }
-
         Ok(())
     }
-
 }
