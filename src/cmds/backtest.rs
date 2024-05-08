@@ -36,17 +36,16 @@ impl Command for BackTestCommand {
 }
 
 #[derive(Deserialize, Debug)]
-struct Time {
+struct StrategyConfig{
+    symbol: String,
+    holding: usize,
     start: String,
     end: String
 }
 
 #[derive(Deserialize)]
 struct Strategy {
-    security: String,
-    // holdings: usize,
-    // time: Time,
-    // cash: usize,
+    config: StrategyConfig,
 }
 
 fn backtest(project_path: &str) {
@@ -56,10 +55,8 @@ fn backtest(project_path: &str) {
 
 fn parse_strategy(project: &str){
     let filename = format!("src/strategy/{}.toml", project);
-    log::info!("{}", filename);
 
     let contents = fs::read_to_string(filename.clone()).unwrap_or_else(|_| "WTF".to_string());
-    log::info!("{}", contents);
 
     let data: Strategy = match toml::from_str(&contents) {
         Ok(d) => d,
@@ -69,5 +66,5 @@ fn parse_strategy(project: &str){
         }
     };
 
-    println!("{}", data.security);
+    println!("{:?}", data.config);
 }

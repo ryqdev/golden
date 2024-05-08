@@ -1,13 +1,6 @@
-[security]
+[config]
 symbol = "TLT"
+holding = 100
+start = "20200101"
+end = "20240101"
 
-#[holdings]
-#holding = 100
-#
-#[time]
-#start = "20200101"
-#end = "20240101"
-#
-#[cash]
-#cash = 1000000
-#
