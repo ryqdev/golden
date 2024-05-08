@@ -120,7 +120,6 @@ fn parse_data() -> Result<Vec<Data>> {
         data_frame.close = record[4].to_string();
         data_frame.adj_close= record[5].to_string();
         data_frame.volume = record[6].to_string();
-        println!("{:?}", data_frame);
         data_list.push(data_frame);
     }
     // log::info!("{:?}", data_list);
