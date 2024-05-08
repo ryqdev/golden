@@ -13,3 +13,4 @@ log = "0.4.21"
 toml = "0.8.12"
 serde = { version = "1.0.200", features = ["derive"] }
 serde_derive = "1.0.200"
+csv = "1.3.0"
