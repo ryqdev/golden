@@ -64,18 +64,7 @@ struct Data{
 
 fn backtest(project_path: &str) {
     log::info!("Backtesting {}...", project_path);
-    let strategy = match parse_strategy(project_path) {
-        Ok(s) => s,
-        Err(_) => {
-            eprintln!("???");
-            exit(1);
-        }
-    };
-
-    log::info!("{:?}", strategy);
-
-    let data = parse_data().unwrap();
-    execute_strategy(strategy, data)
+    execute_strategy(parse_strategy(project_path).unwrap(), parse_data().unwrap())
 }
 
 fn parse_strategy(project: &str) -> Result<Strategy>{
@@ -129,6 +118,7 @@ fn parse_data() -> Result<Vec<Data>> {
 
 fn execute_strategy(strategy: Strategy, data: Vec<Data>)  {
     log::info!("executing...");
+    log::info!("strategy: {:?}", strategy);
     let start_price = &data[0].close;
     let end_price = &data[data.len() - 1].close;
     log::info!("{} - {}", start_price, end_price)
