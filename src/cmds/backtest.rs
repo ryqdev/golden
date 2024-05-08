@@ -54,7 +54,7 @@ fn backtest(project_path: &str) {
 }
 
 fn parse_strategy(project: &str){
-    let filename = format!("src/strategy/{}.toml", project);
+    let filename = format!("strategy/{}.toml", project);
 
     let contents = fs::read_to_string(filename.clone()).unwrap_or_else(|_| "WTF".to_string());
 
