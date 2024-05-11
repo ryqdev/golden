@@ -4,10 +4,11 @@ use clap::{Arg, ArgMatches, Command as ClapCommand};
 use serde_derive::{Deserialize, Serialize};
 use super::Command;
 use std::process::exit;
-use clickhouse::{ Client, Row};
+use clickhouse::{ Client, Row, serde::time::date};
 use async_trait::async_trait;
 use std::env;
 use dotenv::dotenv;
+use time::Date;
 
 
 pub struct BackTestCommand;
@@ -53,6 +54,8 @@ struct Strategy {
 
 #[derive(Debug, Row, Serialize, Deserialize)]
 struct Data{
+    #[serde(with = "clickhouse::serde::time::date")]
+    date: Date,
     open: f64,
     high: f64,
     low: f64,
@@ -103,8 +106,8 @@ async fn parse_data() -> Result<Vec<Data>> {
 
 async fn fetch(client: &Client) -> Result<Vec<Data>> {
     let mut cursor = client
-        .query("select * from TLT where Volume == ?")
-        .bind(440500)
+        .query("select * from TLT3 where Date == ?")
+        .bind("2002-08-21")
         .fetch::<Data>()?;
 
     let mut data_list :Vec<Data> = Vec::new();
@@ -114,7 +117,6 @@ async fn fetch(client: &Client) -> Result<Vec<Data>> {
 
     Ok(data_list)
 }
-
 
 
 async fn execute_strategy(strategy: Strategy, data: Vec<Data>)  {
