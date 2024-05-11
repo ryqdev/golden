@@ -64,7 +64,7 @@ struct Data{
 
 async fn backtest(project_path: &str) -> Result<()> {
     log::info!("Backtesting {}...", project_path);
-    execute_strategy(parse_strategy(project_path).unwrap(), parse_data().await?);
+    execute_strategy(parse_strategy(project_path).unwrap(), parse_data().await?).await;
     Ok(())
 }
 
@@ -109,7 +109,6 @@ async fn fetch(client: &Client) -> Result<Vec<Data>> {
 
     let mut data_list :Vec<Data> = Vec::new();
     while let Some(row) = cursor.next().await? {
-        println!("{row:?}");
         data_list.push(row);
     }
 
@@ -123,5 +122,5 @@ async fn execute_strategy(strategy: Strategy, data: Vec<Data>)  {
     log::info!("strategy: {:?}", strategy);
     let start_price = &data[0].close;
     let end_price = &data[data.len() - 1].close;
-    log::info!("{} - {}", start_price, end_price)
+    log::info!("P&L: {} - {}", start_price, end_price)
 }
