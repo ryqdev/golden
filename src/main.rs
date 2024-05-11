@@ -8,10 +8,11 @@ use crate::{
         BackTestCommand
     }
 };
-use anyhow::Error;
+use anyhow::{Error,Result};
 
 
-fn main() -> Result<(),Error> {
+#[tokio::main]
+async fn main() -> Result<()> {
     let cmd = clap::Command::new("golden")
         .subcommands(vec![
             DataCommand::usage().display_order(1),
@@ -24,8 +25,8 @@ fn main() -> Result<(),Error> {
         .init();
 
     match cmd.get_matches().subcommand() {
-        Some(("data", sub_m)) => Ok(DataCommand::handler(sub_m)?),
-        Some(("backtest", sub_m)) => Ok(BackTestCommand::handler(sub_m)?),
+        Some(("data", sub_m)) => Ok(DataCommand::handler(sub_m).await?),
+        Some(("backtest", sub_m)) => Ok(BackTestCommand::handler(sub_m).await?),
         _ => Err(Error::msg("match error!!!")),
     }
 

@@ -1,10 +1,13 @@
 use clap::{ArgMatches, Command as ClapCommand};
-use anyhow::Error;
+use anyhow::Result;
+use async_trait::async_trait;
 
 
+
+#[async_trait]
 pub trait Command {
     fn usage() -> ClapCommand;
-    fn handler(m: &ArgMatches) -> Result<(), Error>;
+    async fn handler(m: &ArgMatches) -> Result<()>;
 }
 
 

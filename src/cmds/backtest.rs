@@ -1,17 +1,17 @@
-use std::fmt::format;
 use std::fs;
-use anyhow::{Error, Result};
+use anyhow::{Result};
 use clap::{Arg, ArgMatches, Command as ClapCommand};
-use clap::builder::Str;
-use serde_derive::Deserialize;
+use serde_derive::{Deserialize, Serialize};
 use super::Command;
 use std::process::exit;
-use std::fs::File;
-use log::info;
+use clickhouse::{ Client, Row};
+use async_trait::async_trait;
 
 
 pub struct BackTestCommand;
 
+
+#[async_trait]
 impl Command for BackTestCommand {
     fn usage() -> ClapCommand {
         ClapCommand::new("backtest")
@@ -26,13 +26,10 @@ impl Command for BackTestCommand {
             )
     }
 
-    fn handler(m: &ArgMatches) -> Result<(), Error> {
+    async fn handler(m: &ArgMatches) -> Result<()> {
         log::info!("handle backtest command");
-
-        match m.get_one::<String>("project").map(String::as_str){
-            Some(project_path) => backtest(project_path),
-            None => (),
-        }
+        let project = m.get_one::<String>("project")?;
+        backtest(project).await?;
         Ok(())
     }
 
@@ -51,20 +48,22 @@ struct Strategy {
     config: StrategyConfig,
 }
 
-#[derive(Deserialize, Debug)]
+
+#[derive(Debug, Row, Serialize, Deserialize)]
 struct Data{
-    date: String,
-    open: String,
-    high: String,
-    low: String,
-    close: String,
-    adj_close: String,
-    volume: String
+    open: f64,
+    high: f64,
+    low: f64,
+    close: f64,
+    adj_close: f64,
+    volume: i64
 }
 
-fn backtest(project_path: &str) {
+
+async fn backtest(project_path: &str) -> Result<()> {
     log::info!("Backtesting {}...", project_path);
-    execute_strategy(parse_strategy(project_path).unwrap(), parse_data().unwrap())
+    execute_strategy(parse_strategy(project_path).unwrap(), parse_data().await?).await;
+    Ok(())
 }
 
 fn parse_strategy(project: &str) -> Result<Strategy>{
@@ -83,40 +82,39 @@ fn parse_strategy(project: &str) -> Result<Strategy>{
     Ok(data)
 }
 
-fn parse_data() -> Result<Vec<Data>> {
+async fn parse_data() -> Result<Vec<Data>> {
     log::info!("parsing data");
-    let filename = "data/TLT.csv";
-    let file = File::open(filename)?;
-    let mut rdr = csv::Reader::from_reader(file);
+
+    let client = Client::default()
+        .with_url("https://famep8kcv5.ap-southeast-1.aws.clickhouse.cloud:8443")
+        .with_user("default")
+        .with_password("0mwC5BD~i3hoK")
+        .with_database("default");
+
+    let data = fetch(&client).await?;
+
+    Ok(data)
+}
+
+
+async fn fetch(client: &Client) -> Result<Vec<Data>> {
+    let mut cursor = client
+        .query("select * from TLT where Volume == ?")
+        .bind(206400)
+        .fetch::<Data>()?;
 
     let mut data_list :Vec<Data> = Vec::new();
-
-    for result in rdr.records().into_iter() {
-        let mut data_frame = Data{
-            date: "".to_string(),
-            open: "".to_string(),
-            high: "".to_string(),
-            low: "".to_string(),
-            close: "".to_string(),
-            adj_close: "".to_string(),
-            volume: "".to_string(),
-        };
-        let record = result?;
-        data_frame.date = record[0].to_string();
-        data_frame.open= record[1].to_string();
-        data_frame.high = record[2].to_string();
-        data_frame.low = record[3].to_string();
-        data_frame.close = record[4].to_string();
-        data_frame.adj_close= record[5].to_string();
-        data_frame.volume = record[6].to_string();
-        data_list.push(data_frame);
+    while let Some(row) = cursor.next().await? {
+        println!("{row:?}");
+        data_list.push(row);
     }
-    // log::info!("{:?}", data_list);
+
     Ok(data_list)
 }
 
 
-fn execute_strategy(strategy: Strategy, data: Vec<Data>)  {
+
+async fn execute_strategy(strategy: Strategy, data: Vec<Data>)  {
     log::info!("executing...");
     log::info!("strategy: {:?}", strategy);
     let start_price = &data[0].close;

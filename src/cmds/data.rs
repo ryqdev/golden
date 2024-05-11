@@ -1,6 +1,7 @@
 use super::Command;
 use clap::{Arg, ArgAction, ArgMatches, Command as ClapCommand};
-use anyhow::Error;
+use anyhow::Result;
+
 
 pub struct DataCommand;
 
@@ -27,11 +28,11 @@ impl Command for DataCommand {
             )
     }
 
-    fn handler(m: &ArgMatches) -> Result<(), Error> {
+    async fn handler(m: &ArgMatches) -> Result<()> {
         log::info!("handle data command");
         if m.contains_id("download") {
             match m.get_one::<String>("download").map(String::as_str){
-                Some(equity) => log::info!("Downloading {:?}...", equity),
+                Some(equity) => fetch_data(equity).await,
                 None => (),
             }
         }
@@ -43,4 +44,8 @@ impl Command for DataCommand {
         }
         Ok(())
     }
+}
+
+async fn fetch_data(equity: &str){
+    log::info!("Fetching...{equity}")
 }
