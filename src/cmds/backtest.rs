@@ -28,7 +28,7 @@ impl Command for BackTestCommand {
 
     async fn handler(m: &ArgMatches) -> Result<()> {
         log::info!("handle backtest command");
-        let project = m.get_one::<String>("project")?;
+        let project = m.get_one::<String>("project").unwrap();
         backtest(project).await?;
         Ok(())
     }
