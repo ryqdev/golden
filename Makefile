@@ -1,6 +1,6 @@
 
 backtest:
-	@RUST_LOG=info cargo run backtest --project buy_and_hold
+	cargo run backtest --project buy_and_hold
 
 data:
-	@RUST_LOG=info cargo run data -d SPY
+	cargo run data -d SPY
