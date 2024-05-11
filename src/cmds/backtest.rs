@@ -6,6 +6,8 @@ use super::Command;
 use std::process::exit;
 use clickhouse::{ Client, Row};
 use async_trait::async_trait;
+use std::env;
+use dotenv::dotenv;
 
 
 pub struct BackTestCommand;
@@ -62,7 +64,7 @@ struct Data{
 
 async fn backtest(project_path: &str) -> Result<()> {
     log::info!("Backtesting {}...", project_path);
-    execute_strategy(parse_strategy(project_path).unwrap(), parse_data().await?).await;
+    execute_strategy(parse_strategy(project_path).unwrap(), parse_data().await?);
     Ok(())
 }
 
@@ -84,14 +86,16 @@ fn parse_strategy(project: &str) -> Result<Strategy>{
 
 async fn parse_data() -> Result<Vec<Data>> {
     log::info!("parsing data");
-
+    dotenv().ok();
+    let password = env::var("PASSWORD").expect("Cannot find password in .env file");
     let client = Client::default()
         .with_url("https://famep8kcv5.ap-southeast-1.aws.clickhouse.cloud:8443")
         .with_user("default")
-        .with_password("0mwC5BD~i3hoK")
+        .with_password(password)
         .with_database("default");
 
     let data = fetch(&client).await?;
+    log::info!("{:?}", data);
 
     Ok(data)
 }
@@ -100,7 +104,7 @@ async fn parse_data() -> Result<Vec<Data>> {
 async fn fetch(client: &Client) -> Result<Vec<Data>> {
     let mut cursor = client
         .query("select * from TLT where Volume == ?")
-        .bind(206400)
+        .bind(440500)
         .fetch::<Data>()?;
 
     let mut data_list :Vec<Data> = Vec::new();
