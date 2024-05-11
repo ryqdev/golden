@@ -67,7 +67,7 @@ struct Data{
 
 async fn backtest(project_path: &str) -> Result<()> {
     log::info!("Backtesting {}...", project_path);
-    execute_strategy(parse_strategy(project_path).unwrap(), parse_data().await?).await;
+    execute_strategy(parse_strategy(project_path).unwrap() ).await?;
     Ok(())
 }
 
@@ -75,7 +75,6 @@ fn parse_strategy(project: &str) -> Result<Strategy>{
     let filename = format!("strategy/{}.toml", project);
 
     let contents = fs::read_to_string(filename.clone()).unwrap_or_else(|_| "WTF".to_string());
-
     let data: Strategy = match toml::from_str(&contents) {
         Ok(d) => d,
         Err(_) => {
@@ -87,8 +86,8 @@ fn parse_strategy(project: &str) -> Result<Strategy>{
     Ok(data)
 }
 
-async fn parse_data() -> Result<Vec<Data>> {
-    log::info!("parsing data");
+async fn parse_data(date: String) -> Result<Data> {
+    log::info!("parsing data on {date}");
     dotenv().ok();
     let password = env::var("PASSWORD").expect("Cannot find password in .env file");
     let client = Client::default()
@@ -97,32 +96,30 @@ async fn parse_data() -> Result<Vec<Data>> {
         .with_password(password)
         .with_database("default");
 
-    let data = fetch(&client).await?;
+    let data = fetch(&client, date).await?;
     log::info!("{:?}", data);
 
     Ok(data)
 }
 
 
-async fn fetch(client: &Client) -> Result<Vec<Data>> {
+async fn fetch(client: &Client, date: String) -> Result<Data> {
     let mut cursor = client
         .query("select * from TLT3 where Date == ?")
-        .bind("2002-08-21")
+        .bind(date)
         .fetch::<Data>()?;
 
-    let mut data_list :Vec<Data> = Vec::new();
-    while let Some(row) = cursor.next().await? {
-        data_list.push(row);
-    }
+    let Some(date) = cursor.next().await? else {panic!("db error")};
 
-    Ok(data_list)
+    Ok(date)
 }
 
 
-async fn execute_strategy(strategy: Strategy, data: Vec<Data>)  {
+async fn execute_strategy(strategy: Strategy) -> Result<()> {
     log::info!("executing...");
     log::info!("strategy: {:?}", strategy);
-    let start_price = &data[0].close;
-    let end_price = &data[data.len() - 1].close;
-    log::info!("P&L: {} - {}", start_price, end_price)
+    let start_price = parse_data(strategy.config.start).await?;
+    let end_price = parse_data(strategy.config.end).await?;
+    log::info!("P&L: {} - {}", start_price.close, end_price.close);
+    Ok(())
 }

@@ -1,6 +1,6 @@
 [config]
 symbol = "TLT"
 holding = 100
-start = "2020-01-01"
-end = "2024-01-01"
+start = "2024-04-09"
+end = "2024-04-30"
 
