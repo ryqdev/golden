@@ -32,7 +32,7 @@ impl Command for DataCommand {
         log::info!("handle data command");
         if m.contains_id("download") {
             match m.get_one::<String>("download").map(String::as_str){
-                Some(equity) => fetch_data(equity).await,
+                Some(equity) => log::info!("download {:?}...", equity),
                 None => (),
             }
         }
@@ -44,8 +44,4 @@ impl Command for DataCommand {
         }
         Ok(())
     }
-}
-
-async fn fetch_data(equity: &str){
-    log::info!("Fetching...{equity}")
 }
