@@ -1,7 +1,7 @@
+use std::io::Write;
+
 mod cmds;
 use crate::{cmds::{Command, DataCommand, BackTestCommand}};
-
-use std::io::Write;
 
 
 #[tokio::main]

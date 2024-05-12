@@ -4,7 +4,7 @@ use clap::{Arg, ArgMatches, Command as ClapCommand};
 use serde_derive::{Deserialize, Serialize};
 use super::Command;
 use std::process::exit;
-use clickhouse::{ Client, Row, serde::time::date};
+use clickhouse::{ Client, Row};
 use async_trait::async_trait;
 use std::env;
 use dotenv::dotenv;
@@ -120,6 +120,6 @@ async fn execute_strategy(strategy: Strategy) -> Result<()> {
     log::info!("strategy: {:?}", strategy);
     let start_price = parse_data(strategy.config.start).await?;
     let end_price = parse_data(strategy.config.end).await?;
-    log::info!("P&L: {} - {}", start_price.close, end_price.close);
+    log::info!("P&L: {}:{}, {} -> {}", strategy.config.symbol, strategy.config.holding, start_price.close, end_price.close);
     Ok(())
 }
