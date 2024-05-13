@@ -4,3 +4,6 @@ backtest:
 
 data:
 	cargo run data -d SPY
+
+paper:
+	cargo run paper-trading

@@ -1,7 +1,7 @@
 use std::io::Write;
 
 mod cmds;
-use crate::{cmds::{Command, DataCommand, BackTestCommand}};
+use crate::{cmds::{Command, DataCommand, BackTestCommand, PaperTradingCommand}};
 
 
 #[tokio::main]
@@ -25,11 +25,13 @@ async fn main() -> anyhow::Result<()> {
         .subcommands(vec![
             DataCommand::usage().display_order(1),
             BackTestCommand::usage().display_order(2),
+            PaperTradingCommand::usage().display_order(3)
         ]);
 
     match cmd.get_matches().subcommand() {
         Some(("data", sub_m)) => Ok(DataCommand::handler(sub_m).await?),
         Some(("backtest", sub_m)) => Ok(BackTestCommand::handler(sub_m).await?),
+        Some(("paper-trading", sub_m)) => Ok(PaperTradingCommand::handler(sub_m).await?),
         _ => Err(anyhow::Error::msg("match error!!!")),
     }
 

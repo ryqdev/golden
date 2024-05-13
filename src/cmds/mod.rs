@@ -3,7 +3,6 @@ use anyhow::Result;
 use async_trait::async_trait;
 
 
-
 #[async_trait]
 pub trait Command {
     fn usage() -> ClapCommand;
@@ -13,6 +12,8 @@ pub trait Command {
 
 mod data;
 mod backtest;
+mod paper;
 
 pub use data::DataCommand;
 pub use backtest::BackTestCommand;
+pub use paper::PaperTradingCommand;
