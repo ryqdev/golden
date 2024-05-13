@@ -10,10 +10,6 @@ pub trait Command {
 }
 
 
-mod data;
-mod backtest;
-mod paper;
-
-pub use data::DataCommand;
-pub use backtest::BackTestCommand;
-pub use paper::PaperTradingCommand;
+pub mod data;
+pub mod backtest;
+pub mod paper;
