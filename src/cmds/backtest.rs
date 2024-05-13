@@ -18,7 +18,7 @@ pub struct BackTestCommand;
 impl Command for BackTestCommand {
     fn usage() -> ClapCommand {
         ClapCommand::new("backtest")
-            .about("Back test strategies")
+            .about("back test strategies")
             .visible_alias("b")
             .arg(
                 Arg::new("project")

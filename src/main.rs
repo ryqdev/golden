@@ -27,7 +27,6 @@ async fn main() -> anyhow::Result<()> {
             BackTestCommand::usage().display_order(2),
         ]);
 
-
     match cmd.get_matches().subcommand() {
         Some(("data", sub_m)) => Ok(DataCommand::handler(sub_m).await?),
         Some(("backtest", sub_m)) => Ok(BackTestCommand::handler(sub_m).await?),

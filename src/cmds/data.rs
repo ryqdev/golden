@@ -17,15 +17,7 @@ impl Command for DataCommand {
                     .display_order(1)
                     .short('d')
                     .long("download")
-                    .help("Download data")
-                    .action(ArgAction::Set),
-            )
-            .arg(
-                Arg::new("update")
-                    .display_order(2)
-                    .short('u')
-                    .long("update")
-                    .help("Update data")
+                    .help("download data")
                     .action(ArgAction::Set),
             )
     }
@@ -35,12 +27,6 @@ impl Command for DataCommand {
         if m.contains_id("download") {
             match m.get_one::<String>("download").map(String::as_str){
                 Some(equity) => log::info!("download {:?}...", equity),
-                None => (),
-            }
-        }
-        if m.contains_id("update") {
-            match m.get_one::<String>("update").map(String::as_str){
-                Some(equity) => log::info!("Updating {:?}...", equity),
                 None => (),
             }
         }
