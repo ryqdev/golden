@@ -7,9 +7,7 @@ use crate::{cmds::{Command,
                    paper::PaperTradingCommand}
 };
 
-
-#[tokio::main]
-async fn main() -> anyhow::Result<()> {
+fn init_log() {
     env_logger::Builder::new()
         .format(|buf, record| {
             writeln!(
@@ -24,6 +22,12 @@ async fn main() -> anyhow::Result<()> {
         })
         .filter_level(log::LevelFilter::Info)
         .init();
+}
+
+#[tokio::main]
+async fn main() -> anyhow::Result<()> {
+
+    init_log();
 
     let cmd = clap::Command::new("golden")
         .subcommands(vec![
@@ -38,5 +42,4 @@ async fn main() -> anyhow::Result<()> {
         Some(("paper-trading", sub_m)) => Ok(PaperTradingCommand::handler(sub_m).await?),
         _ => Err(anyhow::Error::msg("match error!!!")),
     }
-
 }
