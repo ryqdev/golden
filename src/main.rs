@@ -2,7 +2,6 @@ use std::io::Write;
 
 mod cmds;
 use crate::{cmds::{Command,
-                   data::DataCommand,
                    backtest::BackTestCommand,
                    paper::PaperTradingCommand}
 };
@@ -31,13 +30,11 @@ async fn main() -> anyhow::Result<()> {
 
     let cmd = clap::Command::new("golden")
         .subcommands(vec![
-            DataCommand::usage().display_order(1),
-            BackTestCommand::usage().display_order(2),
-            PaperTradingCommand::usage().display_order(3)
+            BackTestCommand::usage().display_order(1),
+            PaperTradingCommand::usage().display_order(2)
         ]);
 
     match cmd.get_matches().subcommand() {
-        Some(("data", sub_m)) => Ok(DataCommand::handler(sub_m).await?),
         Some(("backtest", sub_m)) => Ok(BackTestCommand::handler(sub_m).await?),
         Some(("paper-trading", sub_m)) => Ok(PaperTradingCommand::handler(sub_m).await?),
         _ => Err(anyhow::Error::msg("match error!!!")),
