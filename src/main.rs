@@ -3,7 +3,8 @@ use std::io::Write;
 mod cmds;
 use crate::{cmds::{Command,
                    backtest::BackTestCommand,
-                   paper::PaperTradingCommand}
+                   paper::PaperTradingCommand,
+                   live::LiveTradingCommand}
 };
 
 fn init_log() {
@@ -31,12 +32,14 @@ async fn main() -> anyhow::Result<()> {
     let cmd = clap::Command::new("golden")
         .subcommands(vec![
             BackTestCommand::usage().display_order(1),
-            PaperTradingCommand::usage().display_order(2)
+            PaperTradingCommand::usage().display_order(2),
+            LiveTradingCommand::usage().display_order(3)
         ]);
 
     match cmd.get_matches().subcommand() {
         Some(("backtest", sub_m)) => Ok(BackTestCommand::handler(sub_m).await?),
         Some(("paper-trading", sub_m)) => Ok(PaperTradingCommand::handler(sub_m).await?),
+        Some(("live-trading", sub_m)) => Ok(LiveTradingCommand::handler(sub_m).await?),
         _ => Err(anyhow::Error::msg("match error!!!")),
     }
 }

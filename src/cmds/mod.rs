@@ -12,4 +12,4 @@ pub trait Command {
 
 pub mod backtest;
 pub mod paper;
-mod live;
+pub mod live;
