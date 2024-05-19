@@ -22,26 +22,26 @@ impl Command for BackTestCommand {
             .about("back test strategies")
             .visible_alias("b")
             .arg(
-                Arg::new("project")
-                    .long("project")
+                Arg::new("symbol")
+                    .long("symbol")
                     .value_parser(clap::value_parser!(String))
-                    .help("project name")
+                    .help("symbol")
                     .num_args(1),
             )
     }
 
     async fn handler(m: &ArgMatches) -> Result<()> {
-        log::info!("handle backtest command");
-        let project = m.get_one::<String>("project").unwrap();
-        backtest(project).await?;
+        log::info!("handle backtest");
+        let symbol = m.get_one::<String>("symbol").unwrap();
+        backtest(symbol).await?;
         Ok(())
     }
 
 }
 
 
-async fn backtest(project_path: &str) -> Result<()> {
-    log::info!("Backtesting {}...", project_path);
+async fn backtest(symbol: &str) -> Result<()> {
+    log::info!("Backtesting {}...", symbol);
     let green = Green::new()?;
 
     // green.add_strategy(BuyAndHold);

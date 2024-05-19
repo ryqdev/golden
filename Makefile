@@ -1,6 +1,6 @@
 
 backtest:
-	cargo run backtest --project buy_and_hold
+	cargo run backtest --symbol ${symbol}
 
 paper:
 	cargo run paper-trading

@@ -27,5 +27,7 @@ impl Green {
     pub fn add_strategy(&self, strategy: Box<dyn Strategy>){}
     pub fn add_analyzer(&self, analyzer: Box<dyn Analyzer>){}
     pub fn run(&self) {}
-    pub fn plot(&self) {}
+    pub fn plot(&self) {
+        log::info!("Ploting...");
+    }
 }
