@@ -21,7 +21,6 @@ impl Green {
             data: "foobar".to_string(),
         })
     }
-    // TODO: why Box dyn?
     pub fn add_data_feed(&self, data: Box<dyn BaseData>){}
     pub fn add_broker(&self,broker: Box<dyn Broker>){}
     pub fn add_strategy(&self, strategy: Box<dyn Strategy>){}
