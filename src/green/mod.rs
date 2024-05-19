@@ -2,6 +2,7 @@ pub mod strategy;
 pub mod feeds;
 mod broker;
 mod analyzer;
+mod visualization;
 
 use crate::err::Error;
 use crate::green::{
@@ -28,5 +29,13 @@ impl Green {
     pub fn run(&self) {}
     pub fn plot(&self) {
         log::info!("Ploting...");
+
+        // with egui
+        let native_options = eframe::NativeOptions::default();
+        eframe::run_native(
+            "candlestic chart",
+            native_options,
+            Box::new(|cc| Box::new(visualization::plotting::App::new(cc))),
+        ).expect("Plotting error");
     }
 }
