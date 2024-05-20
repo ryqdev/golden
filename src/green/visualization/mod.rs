@@ -1,1 +1,1 @@
-pub mod plotting;
+pub mod candle;

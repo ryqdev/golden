@@ -35,7 +35,7 @@ impl Green {
         eframe::run_native(
             "candlestic chart",
             native_options,
-            Box::new(|cc| Box::new(visualization::plotting::App::new(cc))),
+            Box::new(|cc| Box::new(visualization::candle::App::new(cc))),
         ).expect("Plotting error");
     }
 }

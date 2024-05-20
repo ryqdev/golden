@@ -1,4 +1,7 @@
 
+debug:
+	RUST_BACKTRACE=1 cargo run backtest --symbol ${symbol}
+
 backtest:
 	cargo run backtest --symbol ${symbol}
 
