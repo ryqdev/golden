@@ -6,8 +6,6 @@ use egui::{
     Stroke,
     Color32,
 };
-use egui::Key::O;
-use egui::Shape::Vec;
 use egui_plot::{
     Plot,
     BoxPlot,
@@ -27,7 +25,7 @@ impl App {
     }
 }
 
-type HistoricalData = (String, std::vec::Vec<f64>);
+type HistoricalData = (String, Vec<f64>);
 
 fn fetch_csv_data(symbol: &str) -> anyhow::Result<BoxPlot> {
     let red = Color32::from_rgb(255,0,0);
@@ -55,7 +53,6 @@ fn fetch_csv_data(symbol: &str) -> anyhow::Result<BoxPlot> {
         );
         idx += 1.0
     }
-
 
     Ok(BoxPlot::new(historical_data))
 }
