@@ -29,13 +29,12 @@ impl App {
 
 type HistoricalData = (String, std::vec::Vec<f64>);
 
-
-fn fetch_csv_data() -> anyhow::Result<BoxPlot> {
+fn fetch_csv_data(symbol: &str) -> anyhow::Result<BoxPlot> {
     let red = Color32::from_rgb(255,0,0);
     let green = Color32::from_rgb(0,255,0);
 
     // Date,Open,High,Low,Close,Adj Close,Volume
-    let file = File::open("data/SPY.csv")?;
+    let file = File::open(format!("data/{symbol}.csv"))?;
 
     let mut reader = csv::ReaderBuilder::new()
         .has_headers(true)
@@ -61,8 +60,8 @@ fn fetch_csv_data() -> anyhow::Result<BoxPlot> {
     Ok(BoxPlot::new(historical_data))
 }
 
-fn candlestick_chart(ui: &mut egui::Ui) -> anyhow::Result<()> {
-    let data = fetch_csv_data()?;
+fn candlestick_chart(ui: &mut egui::Ui, symbol: &str) -> anyhow::Result<()> {
+    let data = fetch_csv_data(symbol)?;
 
     let plot = Plot::new("candlestick chart")
         .view_aspect(2.0);
@@ -79,7 +78,7 @@ impl eframe::App for App {
             ui.label(format!("value = {}", self.value));
         });
         egui::Window::new("My Window").show(ctx, |ui| {
-            candlestick_chart(ui).expect("render error");
+            candlestick_chart(ui, "SPY").expect("render error");
         });
     }
 }
