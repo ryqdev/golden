@@ -4,7 +4,7 @@ use std::{
 use eframe::emath::Vec2;
 
 use egui::{Stroke, Color32, DragValue, Event};
-use egui_plot::{Plot, BoxPlot, BoxElem, BoxSpread, Legend};
+use egui_plot::{Plot, BoxPlot, BoxElem, BoxSpread, Legend, PlotPoints, Line};
 
 
 #[derive(Default)]
@@ -87,8 +87,10 @@ impl eframe::App for App {
                 ui.label("Scroll speed").on_hover_text("How fast to pan with the mouse wheel");
             });
         });
+
         egui::SidePanel::right("portfolio").show(ctx, |ui| {
             ui.label("Portfolio: 100000");
+            ui.label("Orders:");
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
@@ -152,7 +154,8 @@ impl eframe::App for App {
                     }
                     let data = fetch_csv_data("SPY").expect("fetch csv data error");
                     plot_ui.box_plot(data);
-
+                    let sine_points = PlotPoints::from_explicit_callback(|x| x * 0.01, .., 5000);
+                    plot_ui.line(Line::new(sine_points).name("Line"));
                 });
         });
     }
