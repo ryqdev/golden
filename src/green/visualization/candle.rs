@@ -20,7 +20,7 @@ pub struct App {
 
 type HistoricalData = (String, Vec<f64>);
 
-fn fetch_csv_data(symbol: &str) -> anyhow::Result<BoxPlot> {
+fn fetch_csv_data(symbol: &str, close_price_array: &mut Vec<f64>) -> anyhow::Result<BoxPlot> {
     let red = Color32::from_rgb(255,0,0);
     let green = Color32::from_rgb(0,255,0);
 
@@ -40,6 +40,7 @@ fn fetch_csv_data(symbol: &str) -> anyhow::Result<BoxPlot> {
         let open = record.1[0];
         let close = record.1[3];
         let high = record.1[1];
+        close_price_array.push(close);
         let color = if close >= open {green} else {red};
         historical_data.push(
             BoxElem::new(idx, BoxSpread::new(low, open, open,close , high)).whisker_width(0.0).fill(color).stroke(Stroke::new(2.0, color)),
@@ -47,24 +48,11 @@ fn fetch_csv_data(symbol: &str) -> anyhow::Result<BoxPlot> {
         idx += 1.0
     }
 
-    Ok(BoxPlot::new(historical_data))
-}
-
-fn candlestick_chart(ui: &mut egui::Ui, symbol: &str) -> anyhow::Result<()> {
-    let data = fetch_csv_data(symbol)?;
-
-    let plot = Plot::new("candlestick chart")
-        .view_aspect(2.0);
-
-    plot.show(ui, |plot_ui| {
-        plot_ui.box_plot(data);
-    });
-    Ok(())
+    Ok(BoxPlot::new(historical_data).name("candle"))
 }
 
 impl eframe::App for App {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-
         egui::SidePanel::left("options").show(ctx, |ui| {
             ui.checkbox(&mut self.lock_x, "Lock x axis").on_hover_text("Check to keep the X axis fixed, i.e., pan and zoom will only affect the Y axis");
             ui.checkbox(&mut self.lock_y, "Lock y axis").on_hover_text("Check to keep the Y axis fixed, i.e., pan and zoom will only affect the X axis");
@@ -73,16 +61,16 @@ impl eframe::App for App {
             ui.horizontal(|ui| {
                 ui.add(
                     DragValue::new(&mut self.zoom_speed)
-                        .clamp_range(0.1..=2.0)
-                        .speed(0.1),
+                        .clamp_range(10.0..=20.0)
+                        .speed(1),
                 );
                 ui.label("Zoom speed").on_hover_text("How fast to zoom in and out with the mouse wheel");
             });
             ui.horizontal(|ui| {
                 ui.add(
                     DragValue::new(&mut self.scroll_speed)
-                        .clamp_range(0.1..=100.0)
-                        .speed(0.1),
+                        .clamp_range(10.0..=100.0)
+                        .speed(1),
                 );
                 ui.label("Scroll speed").on_hover_text("How fast to pan with the mouse wheel");
             });
@@ -152,10 +140,38 @@ impl eframe::App for App {
                         }
                         plot_ui.translate_bounds(pointer_translate);
                     }
-                    let data = fetch_csv_data("SPY").expect("fetch csv data error");
+                    let mut close_price_array = vec![];
+                    let data = fetch_csv_data("SPY", &mut close_price_array).expect("fetch csv data error");
                     plot_ui.box_plot(data);
-                    let sine_points = PlotPoints::from_explicit_callback(|x| x * 0.01, .., 5000);
-                    plot_ui.line(Line::new(sine_points).name("Line"));
+                    let cash =  PlotPoints::from_explicit_callback(|x| x * 0.0, .., 5000);
+                    plot_ui.line(Line::new(cash).name("Cash"));
+
+
+                    let mut circles = Vec::new();
+                    let fps_points: egui_plot::PlotPoints = close_price_array
+                        .into_iter()
+                        .enumerate()
+                        .map(|(i, value)| [i as f64, (value * 0.5) as f64])
+                        .collect();
+                    fps_points.points().iter().for_each(|coords| {
+                        if coords.y < 30.0 || coords.y > 40.0 {
+                            let color = if coords.y < 30.0 {
+                                Color32::RED
+                            } else {
+                                Color32::GREEN
+                            };
+                            circles.push(egui::Shape::circle_filled(
+                                plot_ui.screen_from_plot(*coords),
+                                10.0,
+                                color,
+                            ));
+                        }
+                    });
+                    let fps = Line::new(fps_points)
+                        .color(Color32::WHITE)
+                        .width(2.0)
+                        .name("Total Assets");
+                    plot_ui.line(fps);
                 });
         });
     }
