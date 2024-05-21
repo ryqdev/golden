@@ -1,16 +1,11 @@
-use std::{
-    fs,
-    process::exit
-};
 use super::Command;
 use anyhow::{Result};
 use clap::{Arg, ArgMatches, Command as ClapCommand};
 use serde_derive::{Deserialize, Serialize};
-use clickhouse::{ Client, Row};
 use async_trait::async_trait;
 use time::Date;
 use crate::green::{
-    Green, feeds, strategy,
+    Green, feeds, strategy, broker
 };
 use crate::strategy::hold::BuyAndHold;
 
@@ -43,16 +38,15 @@ impl Command for BackTestCommand {
 
 async fn backtest(symbol: &str) -> Result<()> {
     log::info!("Backtesting {}...", symbol);
-    let green = Green::new()?;
+    let green = Green::new()
+        .add_data_feed(feeds::yahoo::YahooFinanceData{
+            csv_file_path: "data/SPY.csv".to_string(),
+            start_date: "1993-01-29".to_string(),
+            end_date: "2024-05-17".to_string()
+        })
+        .add_strategy(BuyAndHold{})
+        .build();
 
-    // green.add_strategy(BuyAndHold);
-
-    // let date_feed: Box<dyn BaseData> = feeds::yahoo::YahooFinanceData{
-    //     csv_file_path: "".to_string(),
-    //     start_date: "".to_string(),
-    //     end_date: "".to_string()
-    // };
-    // green.add_data_feed();
     green.run();
     green.plot();
     Ok(())
