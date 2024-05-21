@@ -65,7 +65,8 @@ pub(crate) fn paper_trading(){
 
     log::info!("{:?}", contract);
 
-    let bars = client.realtime_bars(&contract, BarSize::Sec5, WhatToShow::Bid, false).unwrap();
+    let bars = client.realtime_bars(&contract, BarSize::Sec5, WhatToShow::MidPoint, false).unwrap();
+    log::info!("get bars");
     let mut channel = BreakoutChannel::new(30);
     for bar in bars {
         log::info!("\x1b[93m bar:\x1b[0m {:?} ", bar);
@@ -85,16 +86,16 @@ pub(crate) fn paper_trading(){
         };
 
         let order_id = client.next_order_id();
-        let order = order_builder::market_order(action, 1.0);
+        let order = order_builder::market_order(action, 1000.0);
 
-        // let notices = client.place_order(order_id, &contract, &order).unwrap();
-        // for notice in notices {
-        //     if let OrderNotification::ExecutionData(data) = notice {
-        //         println!("{} {} shares of {}", data.execution.side, data.execution.shares, data.contract.symbol);
-        //     } else {
-        //         println!("{:?}", notice);
-        //     }
-        // }
+        let notices = client.place_order(order_id, &contract, &order).unwrap();
+        for notice in notices {
+            if let OrderNotification::ExecutionData(data) = notice {
+                println!("{} {} shares of {}", data.execution.side, data.execution.shares, data.contract.symbol);
+            } else {
+                println!("{:?}", notice);
+            }
+        }
     }
 
 }
