@@ -1,19 +1,20 @@
-use std::fs;
+use std::{
+    fs,
+    process::exit
+};
+use super::Command;
 use anyhow::{Result};
 use clap::{Arg, ArgMatches, Command as ClapCommand};
 use serde_derive::{Deserialize, Serialize};
-use super::Command;
-use std::process::exit;
 use clickhouse::{ Client, Row};
 use async_trait::async_trait;
 use time::Date;
-use crate::green::{Green, feeds, strategy};
-use crate::green::feeds::BaseData;
+use crate::green::{
+    Green, feeds, strategy,
+};
 use crate::strategy::hold::BuyAndHold;
 
-
 pub struct BackTestCommand;
-
 
 #[async_trait]
 impl Command for BackTestCommand {
