@@ -4,6 +4,7 @@ mod cmds;
 mod green;
 mod err;
 mod strategy;
+use colored::Colorize;
 
 use crate::{cmds::{Command,
                    backtest::BackTestCommand,
@@ -17,9 +18,9 @@ fn init_log() {
             writeln!(
                 buf,
                 "{}:{} {} [{}] - {}",
-                record.file().unwrap_or("unknown"),
+                record.file().unwrap_or("unknown_file"),
                 record.line().unwrap_or(0),
-                chrono::Local::now().format("%Y-%m-%dT%H:%M:%S"),
+                chrono::Local::now().format("%Y-%m-%dT%H:%M:%S").to_string().blue(),
                 record.level(),
                 record.args()
             )
