@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 use clap::{ArgMatches, Command as ClapCommand};
 use crate::cmds::Command;
+use crate::green::broker::paper::paper_trading;
 
 pub struct PaperTradingCommand;
 
@@ -14,6 +15,7 @@ impl Command for PaperTradingCommand {
 
     async fn handler(m: &ArgMatches) -> anyhow::Result<()> {
         log::info!("handle paper trading");
+        paper_trading();
         Ok(())
     }
 }

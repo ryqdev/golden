@@ -1,6 +1,6 @@
 pub mod strategy;
 pub mod feeds;
-mod broker;
+pub mod broker;
 mod analyzer;
 mod visualization;
 
