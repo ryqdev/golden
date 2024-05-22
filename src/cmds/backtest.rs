@@ -39,11 +39,7 @@ impl Command for BackTestCommand {
 async fn backtest(symbol: &str) -> Result<()> {
     log::info!("Backtesting {}...", symbol);
     let green = Green::new()
-        .add_data_feed(feeds::yahoo::YahooFinanceData{
-            csv_file_path: "data/SPY.csv".to_string(),
-            start_date: "1993-01-29".to_string(),
-            end_date: "2024-05-17".to_string()
-        })
+        .add_data_feed("TLT")
         .add_strategy(BuyAndHold{})
         .build();
 

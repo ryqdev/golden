@@ -5,6 +5,8 @@ mod analyzer;
 mod visualization;
 
 use std::default::Default;
+use std::fs::File;
+use ibapi::orders::{Action, order_builder, OrderNotification};
 use crate::err::Error;
 use crate::green::{
     feeds::BaseData,
@@ -18,13 +20,16 @@ use crate::strategy::hold::BuyAndHold;
 
 
 pub struct Green {
-    data: Box<YahooFinanceData>,
+    // TODO: move to Heap?
+    data: Vec<Vec<f64>>,
     strategy: BuyAndHold,
+    broker: dyn Broker,
 }
 
 pub struct GreenBuilder {
-    data: Box<YahooFinanceData>,
+    data: Vec<Vec<f64>>,
     strategy: BuyAndHold,
+    broker: Box<dyn Broker>,
 }
 
 impl Green {
@@ -34,7 +39,27 @@ impl Green {
         }
     }
     pub fn run(&self) {
-        log::info!("running...")
+        log::info!("running...");
+        let client = Broker.connect()
+        // TODO: multi-thread with self.data and self.strategy?
+        for bar in self.data {
+            log::info!("\x1b[93m bar:\x1b[0m {:?} ", bar);
+            let action = Action::Buy;
+
+            // TODO: build the client
+            let order_id = client.next_order_id();
+            let order = order_builder::market_order(action, 1000.0);
+
+            let notices = client.place_order(order_id, &contract, &order).unwrap();
+            for notice in notices {
+                if let OrderNotification::ExecutionData(data) = notice {
+                    println!("{} {} shares of {}", data.execution.side, data.execution.shares, data.contract.symbol);
+                } else {
+                    println!("{:?}", notice);
+                }
+            }
+
+        }
     }
     pub fn plot(&self) {
         log::info!("Ploting...");
@@ -49,26 +74,49 @@ impl Green {
     }
 }
 
+type HistoricalData = (String, Vec<f64>, usize);
 
 impl GreenBuilder{
-    pub fn add_data_feed(&mut self, data: YahooFinanceData) -> &mut GreenBuilder{
-        self.data = Box::from(data);
+    pub fn add_data_feed(&mut self, symbol: &str) -> &mut GreenBuilder{
+        // Date,Open,High,Low,Close,Adj Close,Volume
+        let file = File::open(format!("data/{symbol}.csv"))?;
+
+        let mut reader = csv::ReaderBuilder::new()
+            .has_headers(true)
+            .from_reader(file);
+
+        let mut finance_data = vec![];
+        for result in reader.deserialize() {
+            let record: HistoricalData = result?;
+            let low = record.1[2];
+            let open = record.1[0];
+            let close = record.1[3];
+            let high = record.1[1];
+            finance_data.push(vec![open, high, low, close])
+        }
+        self.data = finance_data;
         self
     }
-    // pub fn add_broker(&mut self,broker: BackTestBroker) -> &mut GreenBuilder {
-    //     self.broker = broker;
-    // }
+    pub fn add_broker(&mut self, broker: BackTestBroker) -> &mut GreenBuilder {
+        self.broker = Box::new(BackTestBroker {
+            cash: broker.cash,
+            net_assets: broker.cash
+        });
+        self
+    }
     pub fn add_strategy(&mut self, strategy: BuyAndHold) -> &mut GreenBuilder{
         self.strategy = strategy;
         self
     }
-    pub fn add_analyzer(&self, analyzer: Box<dyn Analyzer>) -> &GreenBuilder {
+    pub fn add_analyzer(&mut self, analyzer: Box<dyn Analyzer>) -> &GreenBuilder {
         self
     }
-    pub fn build(self) -> Green {
+    pub fn build(&self) -> Box<Green> {
         Green{
-            data: self.data,
-            strategy: self.strategy,
+            // TODO: remove clone?
+            data: self.data.clone(),
+            strategy: self.strategy.clone(),
+            broker: self.broker.clone()
         }
     }
 }

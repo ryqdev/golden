@@ -66,7 +66,6 @@ pub(crate) fn paper_trading(){
     log::info!("{:?}", contract);
 
     let bars = client.realtime_bars(&contract, BarSize::Sec5, WhatToShow::MidPoint, false).unwrap();
-    log::info!("get bars");
     let mut channel = BreakoutChannel::new(30);
     for bar in bars {
         log::info!("\x1b[93m bar:\x1b[0m {:?} ", bar);

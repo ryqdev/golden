@@ -18,24 +18,17 @@ pub struct App {
     scroll_speed: f32,
 }
 
-type HistoricalData = (String, Vec<f64>);
-
-fn fetch_csv_data(symbol: &str, close_price_array: &mut Vec<f64>) -> anyhow::Result<BoxPlot> {
+fn fetch_box_data(symbol: &str, close_price_array: &mut Vec<f64>) -> anyhow::Result<BoxPlot> {
     let red = Color32::from_rgb(255,0,0);
     let green = Color32::from_rgb(0,255,0);
 
-    // Date,Open,High,Low,Close,Adj Close,Volume
-    let file = File::open(format!("data/{symbol}.csv"))?;
-
-    let mut reader = csv::ReaderBuilder::new()
-        .has_headers(true)
-        .from_reader(file);
-
     let mut historical_data = vec![];
-
     let mut idx = 0.0;
+
+    for record in
     for result in reader.deserialize() {
-        let record: HistoricalData = result?;
+        // Date,Open,High,Low,Close,Adj Close,Volume
+        let record: crate::green::feeds::yahoo::HistoricalData = result?;
         let low = record.1[2];
         let open = record.1[0];
         let close = record.1[3];
@@ -50,6 +43,7 @@ fn fetch_csv_data(symbol: &str, close_price_array: &mut Vec<f64>) -> anyhow::Res
 
     Ok(BoxPlot::new(historical_data).name("candle"))
 }
+
 
 impl eframe::App for App {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
@@ -141,7 +135,7 @@ impl eframe::App for App {
                         plot_ui.translate_bounds(pointer_translate);
                     }
                     let mut close_price_array = vec![];
-                    let data = fetch_csv_data("SPY", &mut close_price_array).expect("fetch csv data error");
+                    let data = fetch_box_data("SPY", &mut close_price_array).expect("fetch csv data error");
                     plot_ui.box_plot(data);
                     let cash =  PlotPoints::from_explicit_callback(|x| x * 0.0, .., 5000);
                     plot_ui.line(Line::new(cash).name("Cash"));
