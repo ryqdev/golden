@@ -5,7 +5,8 @@ use serde_derive::{Deserialize, Serialize};
 use async_trait::async_trait;
 use time::Date;
 use crate::green::{
-    Green, feeds, strategy, broker
+    green::Green,
+    feeds, strategy, broker
 };
 use crate::strategy::hold::BuyAndHold;
 
@@ -39,7 +40,7 @@ impl Command for BackTestCommand {
 async fn backtest(symbol: &str) -> Result<()> {
     log::info!("Backtesting {}...", symbol);
     let green = Green::new()
-        .add_data_feed("TLT")
+        .add_data_feed(symbol)
         .add_strategy(BuyAndHold{})
         .build();
 

@@ -9,5 +9,5 @@ impl Broker for BackTestBroker {
     fn set_cash(&mut self, cash: f64) {
         self.cash = cash
     }
-    fn connect(){}
+    // fn connect(){}
 }

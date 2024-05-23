@@ -9,30 +9,28 @@ use egui_plot::{Plot, BoxPlot, BoxElem, BoxSpread, Legend, PlotPoints, Line};
 
 #[derive(Default)]
 pub struct App {
-    value: f64,
-    lock_x: bool,
-    lock_y: bool,
-    ctrl_to_zoom: bool,
-    shift_to_horizontal: bool,
-    zoom_speed: f32,
-    scroll_speed: f32,
+    pub value: f64,
+    pub lock_x: bool,
+    pub lock_y: bool,
+    pub ctrl_to_zoom: bool,
+    pub shift_to_horizontal: bool,
+    pub zoom_speed: f32,
+    pub scroll_speed: f32,
+    pub(crate) candle_data: Vec<Vec<f64>>,
 }
 
-fn fetch_box_data(symbol: &str, close_price_array: &mut Vec<f64>) -> anyhow::Result<BoxPlot> {
+fn fetch_box_data(candle_data: Vec<Vec<f64>>, close_price_array: &mut Vec<f64>) -> anyhow::Result<BoxPlot> {
     let red = Color32::from_rgb(255,0,0);
     let green = Color32::from_rgb(0,255,0);
 
     let mut historical_data = vec![];
     let mut idx = 0.0;
 
-    for record in
-    for result in reader.deserialize() {
-        // Date,Open,High,Low,Close,Adj Close,Volume
-        let record: crate::green::feeds::yahoo::HistoricalData = result?;
-        let low = record.1[2];
-        let open = record.1[0];
-        let close = record.1[3];
-        let high = record.1[1];
+    for record in candle_data {
+        let low = record[2];
+        let open = record[0];
+        let close = record[3];
+        let high = record[1];
         close_price_array.push(close);
         let color = if close >= open {green} else {red};
         historical_data.push(
@@ -40,7 +38,6 @@ fn fetch_box_data(symbol: &str, close_price_array: &mut Vec<f64>) -> anyhow::Res
         );
         idx += 1.0
     }
-
     Ok(BoxPlot::new(historical_data).name("candle"))
 }
 
@@ -135,7 +132,8 @@ impl eframe::App for App {
                         plot_ui.translate_bounds(pointer_translate);
                     }
                     let mut close_price_array = vec![];
-                    let data = fetch_box_data("SPY", &mut close_price_array).expect("fetch csv data error");
+                    // TODO: remove clone()
+                    let data = fetch_box_data(self.candle_data.clone(), &mut close_price_array).expect("fetch csv data error");
                     plot_ui.box_plot(data);
                     let cash =  PlotPoints::from_explicit_callback(|x| x * 0.0, .., 5000);
                     plot_ui.line(Line::new(cash).name("Cash"));
