@@ -60,22 +60,32 @@ impl Green {
     }
     pub fn plot(&self) {
         log::info!("Ploting...");
+        let candle_data = self.data.clone();
 
         // with egui
         let native_options = eframe::NativeOptions::default();
         eframe::run_native(
             "candlestic chart",
             native_options,
-            Box::new(|cc| Box::new(visualization::candle::App::default())),
+            Box::new(|cc| Box::new(visualization::candle::App{
+                value: 0.0,
+                lock_x: false,
+                lock_y: false,
+                ctrl_to_zoom: false,
+                shift_to_horizontal: false,
+                zoom_speed: 0.0,
+                scroll_speed: 0.0,
+                candle_data
+            })),
         ).expect("Plotting error");
     }
 }
 
-type HistoricalData = (String, Vec<f64>, usize);
+// TODO: add more types in HistoricalData
+type HistoricalData = (String, Vec<f64>);
 
 impl GreenBuilder{
     pub fn add_data_feed(&mut self, symbol: &str) -> &mut GreenBuilder{
-        // Date,Open,High,Low,Close,Adj Close,Volume
         let file = File::open(format!("data/{symbol}.csv")).unwrap();
 
         let mut reader = csv::ReaderBuilder::new()

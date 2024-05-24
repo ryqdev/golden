@@ -42,6 +42,7 @@ async fn backtest(symbol: &str) -> Result<()> {
     let green = Green::new()
         .add_data_feed(symbol)
         .add_strategy(BuyAndHold{})
+        // TODO: use build or init?
         .build();
 
     green.run();
