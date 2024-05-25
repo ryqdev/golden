@@ -1,18 +1,16 @@
 # golden
 All in one trading engine
 
-## Why Rust
-- safe
-- fast
-- robust
-
-## GUI
-[egui](https://github.com/emilk/egui)
+## Features
+- [x] Single data feed
+- [x] Single strategy
+- [ ] Multiple data feed
+- [ ] Multiple strategy
+- [x] Backtest UI
+- [x] Single broker: IBKR
+- [x] Live trading with single broker
 
 ## Demo
 ```shell
  make backtest symbol=SPY
 ```
-
-## References
-https://www.youtube.com/watch?v=bpqRqBenG7I&ab_channel=UnderstandingRecruitment
