@@ -68,7 +68,7 @@ impl Green {
             "candlestic chart",
             native_options,
             Box::new(|cc| Box::new(visualization::candle::App{
-                value: 0.0,
+                value: 1_000.0,
                 lock_x: false,
                 lock_y: false,
                 ctrl_to_zoom: false,

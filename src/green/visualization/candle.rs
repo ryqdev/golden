@@ -68,7 +68,7 @@ impl eframe::App for App {
         });
 
         egui::SidePanel::right("portfolio").show(ctx, |ui| {
-            ui.label("Portfolio: 100000");
+            ui.label("Portfolio: 100_000");
             ui.label("Orders:");
         });
 
