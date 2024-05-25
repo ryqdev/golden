@@ -12,7 +12,7 @@
 
 use crate::green::strategy::Strategy;
 
-#[derive(Default, Clone, Copy)]
+#[derive(Default, Clone, Copy, Debug)]
 pub struct BuyAndHold;
 
 impl Strategy for BuyAndHold{

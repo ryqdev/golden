@@ -28,7 +28,7 @@ impl Command for BackTestCommand {
     }
 
     async fn handler(m: &ArgMatches) -> Result<()> {
-        log::info!("handle backtest");
+        log::info!("Handle backtest");
         let symbol = m.get_one::<String>("symbol").unwrap();
         backtest(symbol).await?;
         Ok(())
@@ -38,6 +38,7 @@ impl Command for BackTestCommand {
 
 
 async fn backtest(symbol: &str) -> Result<()> {
+    // use await?
     log::info!("Backtesting {}...", symbol);
     let green = Green::new()
         .add_data_feed(symbol)

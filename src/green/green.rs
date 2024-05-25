@@ -36,7 +36,7 @@ impl Green {
         }
     }
     pub fn run(&self) {
-        log::info!("running...");
+        log::info!("Running {:?}...", self.strategy);
         // let client = BackTestBroker{ cash: 0.0, net_assets: 0.0 };
         // let contract = "foo";
         // // TODO: multi-thread with self.data and self.strategy?
@@ -59,7 +59,7 @@ impl Green {
         // }
     }
     pub fn plot(&self) {
-        log::info!("Ploting...");
+        log::info!("Ploting {:?}...", self.strategy);
         let candle_data = self.data.clone();
 
         // with egui

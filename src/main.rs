@@ -1,10 +1,10 @@
 use std::io::Write;
+use colored::Colorize;
 
 mod cmds;
 mod green;
 mod err;
 mod strategy;
-use colored::Colorize;
 
 use crate::{cmds::{Command,
                    backtest::BackTestCommand,
@@ -45,6 +45,6 @@ async fn main() -> anyhow::Result<()> {
         Some(("backtest", sub_m)) => Ok(BackTestCommand::handler(sub_m).await?),
         Some(("paper-trading", sub_m)) => Ok(PaperTradingCommand::handler(sub_m).await?),
         Some(("live-trading", sub_m)) => Ok(LiveTradingCommand::handler(sub_m).await?),
-        _ => Err(anyhow::Error::msg("Miss arguments. Please access Makefile to get information")),
+        _ => Err(anyhow::Error::msg("Miss arguments. Please access Makefile to get instructions")),
     }
 }

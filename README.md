@@ -9,21 +9,10 @@ All in one trading engine
 ## GUI
 [egui](https://github.com/emilk/egui)
 
-
-## Communication 
-gRPC
-
-
-### gRPC vs RESTful
-
-
-
-## Alerting
-
-
-## Database
-Clickhouse
-
+## Demo
+```shell
+ make backtest symbol=SPY
+```
 
 ## References
 https://www.youtube.com/watch?v=bpqRqBenG7I&ab_channel=UnderstandingRecruitment
