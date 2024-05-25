@@ -8,7 +8,8 @@ use crate::green::{
     green::Green,
     feeds, strategy, broker
 };
-use crate::strategy::hold::BuyAndHold;
+use crate::green::broker::backtest::BackTestBroker;
+use crate::strategy::hold::SimpleStrategy;
 
 pub struct BackTestCommand;
 
@@ -38,12 +39,16 @@ impl Command for BackTestCommand {
 
 
 async fn backtest(symbol: &str) -> Result<()> {
-    // use await?
     log::info!("Backtesting {}...", symbol);
-    let green = Green::new()
+    let cash = 10_000.0;
+    let mut green = Green::new()
         .add_data_feed(symbol)
-        .add_strategy(BuyAndHold{})
-        // TODO: use build or init?
+        .add_broker(100_000.0)
+        .add_strategy(SimpleStrategy {
+            cash: Vec::from([cash]),
+            position: Vec::from([0.0]),
+            net_assets:  Vec::from([cash]),
+        })
         .build();
 
     green.run();

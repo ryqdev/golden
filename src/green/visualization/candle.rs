@@ -17,6 +17,8 @@ pub struct App {
     pub zoom_speed: f32,
     pub scroll_speed: f32,
     pub(crate) candle_data: Vec<Vec<f64>>,
+    pub cash_data: Vec<f64>,
+    pub net_asset_data: Vec<f64>,
 }
 
 fn fetch_box_data(candle_data: Vec<Vec<f64>>, close_price_array: &mut Vec<f64>) -> anyhow::Result<BoxPlot> {
@@ -161,6 +163,28 @@ impl eframe::App for App {
                     });
                     let fps = Line::new(fps_points)
                         .color(Color32::WHITE)
+                        .width(2.0)
+                        .name("Total Assets");
+                    plot_ui.line(fps);
+
+                    let cash_line: egui_plot::PlotPoints = self.cash_data.clone()
+                        .into_iter()
+                        .enumerate()
+                        .map(|(i, value)| [i as f64, (value * 1.0) as f64])
+                        .collect();
+                    let fps = Line::new(cash_line)
+                        .color(Color32::GREEN)
+                        .width(2.0)
+                        .name("Total Assets");
+                    plot_ui.line(fps);
+
+                    let cash_line: egui_plot::PlotPoints = self.net_asset_data.clone()
+                        .into_iter()
+                        .enumerate()
+                        .map(|(i, value)| [i as f64, (value * 1.0) as f64])
+                        .collect();
+                    let fps = Line::new(cash_line)
+                        .color(Color32::BLUE)
                         .width(2.0)
                         .name("Total Assets");
                     plot_ui.line(fps);

@@ -1,3 +1,4 @@
+use std::collections::VecDeque;
 use std::default::Default;
 use std::fs::File;
 use ibapi::orders::{Action, order_builder, OrderNotification};
@@ -10,7 +11,7 @@ use crate::green::{
     broker::backtest::BackTestBroker,
     analyzer::Analyzer
 };
-use crate::strategy::hold::BuyAndHold;
+use crate::strategy::hold::SimpleStrategy;
 use crate::green::visualization;
 
 
@@ -18,15 +19,15 @@ use crate::green::visualization;
 pub struct Green {
     // TODO: use Box?
     data: Vec<Vec<f64>>,
-    strategy: BuyAndHold,
-    // broker: Box<dyn Broker>,
+    strategy: SimpleStrategy,
+    broker: BackTestBroker,
 }
 
 #[derive(Default)]
 pub struct GreenBuilder {
     data: Vec<Vec<f64>>,
-    strategy: BuyAndHold,
-    // broker: Box<dyn Broker>,
+    strategy: SimpleStrategy,
+    broker: BackTestBroker
 }
 
 impl Green {
@@ -35,32 +36,35 @@ impl Green {
             ..Default::default()
         }
     }
-    pub fn run(&self) {
+    pub fn run(&mut self) {
         log::info!("Running {:?}...", self.strategy);
-        // let client = BackTestBroker{ cash: 0.0, net_assets: 0.0 };
-        // let contract = "foo";
-        // // TODO: multi-thread with self.data and self.strategy?
-        // for bar in self.data {
-        //     log::info!("\x1b[93m bar:\x1b[0m {:?} ", bar);
-        //     let action = Action::Buy;
-        //
-        //     // TODO: build the client
-        //     let order_id = client.next_order_id();
-        //     let order = order_builder::market_order(action, 1000.0);
-        //
-        //     let notices = client.place_order(order_id, &contract, &order).unwrap();
-        //     for notice in notices {
-        //         if let OrderNotification::ExecutionData(data) = notice {
-        //             println!("{} {} shares of {}", data.execution.side, data.execution.shares, data.contract.symbol);
-        //         } else {
-        //             println!("{:?}", notice);
-        //         }
-        //     }
-        // }
+        for bar in self.data.iter() {
+            // log::info!("\x1b[93m bar:\x1b[0m {:?} ", bar);
+            self.strategy.next(bar);
+            // let action = Action::Buy;
+            //
+            // // TODO: build the client
+            // let order_id = client.next_order_id();
+            // let order = order_builder::market_order(action, 1000.0);
+            //
+            // let notices = client.place_order(order_id, &contract, &order).unwrap();
+            // for notice in notices {
+            //     if let OrderNotification::ExecutionData(data) = notice {
+            //         println!("{} {} shares of {}", data.execution.side, data.execution.shares, data.contract.symbol);
+            //     } else {
+            //         println!("{:?}", notice);
+            //     }
+            // }
+        }
+        log::info!("{}", self.strategy.cash.last().unwrap());
+        log::info!("{}", self.strategy.position.last().unwrap());
+        log::info!("{}", self.strategy.net_asset.last().unwrap());
     }
     pub fn plot(&self) {
-        log::info!("Ploting {:?}...", self.strategy);
+        // log::info!("Ploting {:?}...", self.strategy);
         let candle_data = self.data.clone();
+        let cash_data = self.strategy.cash.clone();
+        let net_asset_data = self.strategy.net_asset.clone();
 
         // with egui
         let native_options = eframe::NativeOptions::default();
@@ -75,9 +79,14 @@ impl Green {
                 shift_to_horizontal: false,
                 zoom_speed: 0.0,
                 scroll_speed: 0.0,
-                candle_data
+                candle_data,
+                cash_data,
+                net_asset_data,
             })),
         ).expect("Plotting error");
+    }
+    fn run_strategy(&self){
+        self.broker.set_cash(XXX)
     }
 }
 
@@ -104,14 +113,15 @@ impl GreenBuilder{
         self.data = finance_data;
         self
     }
-    // pub fn add_broker(&mut self, broker: BackTestBroker) -> &mut GreenBuilder {
-    //     self.broker = Box::new(BackTestBroker {
-    //         cash: broker.cash,
-    //         net_assets: broker.cash
-    //     });
-    //     self
-    // }
-    pub fn add_strategy(&mut self, strategy: BuyAndHold) -> &mut GreenBuilder{
+    pub fn add_broker(&mut self, cash: f64) -> &mut GreenBuilder {
+        self.broker = BackTestBroker{
+            cash: Vec::from([cash]),
+            position: Vec::from([0.0]),
+            net_assets:  Vec::from([cash]),
+        };
+        self
+    }
+    pub fn add_strategy(&mut self, strategy: SimpleStrategy) -> &mut GreenBuilder{
         self.strategy = strategy;
         self
     }
@@ -120,7 +130,6 @@ impl GreenBuilder{
     }
     pub fn build(&self) -> Box<Green> {
         Box::new(Green{
-            // TODO: remove clone?
             data: self.data.clone(),
             strategy: self.strategy.clone(),
             // broker: self.broker.clone()

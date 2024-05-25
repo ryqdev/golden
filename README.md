@@ -6,6 +6,7 @@ All in one trading engine
 - [x] Single strategy
 - [ ] Multiple data feed
 - [ ] Multiple strategy
+- [ ] Customed backtest time range
 - [x] Backtest UI
 - [x] Single broker: IBKR
 - [x] Live trading with single broker
