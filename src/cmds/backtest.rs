@@ -43,7 +43,7 @@ async fn backtest(symbol: &str) -> Result<()> {
     let cash = 10_000.0;
     let mut green = Green::new()
         .add_data_feed(symbol)
-        .add_broker(100_000.0)
+        // .add_broker(100_000.0)
         .add_strategy(SimpleStrategy {
             cash: Vec::from([cash]),
             position: Vec::from([0.0]),

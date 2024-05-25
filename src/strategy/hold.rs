@@ -29,7 +29,6 @@ impl Strategy for SimpleStrategy {
         self.cash.push(cash - size * price);
         self.position.push(position + size);
         self.net_assets.push(self.cash.last().unwrap() + self.position.last().unwrap() * price);
-        Self::update_broker();
     }
 
     fn sell(&mut self, size: f64, price: f64) {
@@ -39,7 +38,6 @@ impl Strategy for SimpleStrategy {
         self.cash.push(cash + size * price);
         self.position.push(position - size);
         self.net_assets.push(self.cash.last().unwrap() + self.position.last().unwrap() * price);
-        Self::update_broker();
     }
 
 }

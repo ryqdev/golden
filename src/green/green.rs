@@ -20,14 +20,14 @@ pub struct Green {
     // TODO: use Box?
     data: Vec<Vec<f64>>,
     strategy: SimpleStrategy,
-    broker: BackTestBroker,
+    // broker: BackTestBroker,
 }
 
 #[derive(Default)]
 pub struct GreenBuilder {
     data: Vec<Vec<f64>>,
     strategy: SimpleStrategy,
-    broker: BackTestBroker
+    // broker: BackTestBroker
 }
 
 impl Green {
@@ -58,13 +58,13 @@ impl Green {
         }
         log::info!("{}", self.strategy.cash.last().unwrap());
         log::info!("{}", self.strategy.position.last().unwrap());
-        log::info!("{}", self.strategy.net_asset.last().unwrap());
+        log::info!("{}", self.strategy.net_assets.last().unwrap());
     }
     pub fn plot(&self) {
         // log::info!("Ploting {:?}...", self.strategy);
         let candle_data = self.data.clone();
         let cash_data = self.strategy.cash.clone();
-        let net_asset_data = self.strategy.net_asset.clone();
+        let net_asset_data = self.strategy.net_assets.clone();
 
         // with egui
         let native_options = eframe::NativeOptions::default();
@@ -85,9 +85,9 @@ impl Green {
             })),
         ).expect("Plotting error");
     }
-    fn run_strategy(&self){
-        self.broker.set_cash(XXX)
-    }
+    // fn run_strategy(&self){
+    //     self.broker.set_cash(XXX)
+    // }
 }
 
 // TODO: add more types in HistoricalData
@@ -113,14 +113,14 @@ impl GreenBuilder{
         self.data = finance_data;
         self
     }
-    pub fn add_broker(&mut self, cash: f64) -> &mut GreenBuilder {
-        self.broker = BackTestBroker{
-            cash: Vec::from([cash]),
-            position: Vec::from([0.0]),
-            net_assets:  Vec::from([cash]),
-        };
-        self
-    }
+    // pub fn add_broker(&mut self, cash: f64) -> &mut GreenBuilder {
+    //     self.broker = BackTestBroker{
+    //         cash: Vec::from([cash]),
+    //         position: Vec::from([0.0]),
+    //         net_assets:  Vec::from([cash]),
+    //     };
+    //     self
+    // }
     pub fn add_strategy(&mut self, strategy: SimpleStrategy) -> &mut GreenBuilder{
         self.strategy = strategy;
         self
