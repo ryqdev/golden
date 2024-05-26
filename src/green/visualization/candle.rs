@@ -72,6 +72,7 @@ impl eframe::App for App {
 
         egui::SidePanel::right("portfolio")
             .resizable(true)
+            .default_width(1000f32)
             .show(ctx, |ui| {
                 ui.label("Portfolio: 100_000");
                 ui.label("Orders:");
