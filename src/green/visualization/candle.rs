@@ -46,6 +46,46 @@ fn fetch_box_data(candle_data: Vec<Vec<f64>>, close_price_array: &mut Vec<f64>) 
 
 impl eframe::App for App {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
+            ctx.request_repaint_after(std::time::Duration::from_millis(200));
+            egui::menu::bar(ui, |ui| {
+                ui.menu_button("Trading", |ui| {
+                    if ui.button("Equities").clicked() {
+                        println!("> Equities.");
+                    }
+                    if ui.button("Forex").clicked() {
+                        println!("> Forex.");
+                    }
+                });
+                ui.menu_button("Charts", |ui| {
+                    if ui.button("Real Time").clicked() {
+                        println!("> Real Time.");
+                    }
+                    if ui.button("Historical").clicked() {
+                        println!("> Historical.");
+                    }
+                });
+                ui.menu_button("Portfolios", |ui| {
+                    if ui.button("Archimedes I").clicked() {
+                        println!("> Archimedes I.");
+                    }
+                });
+                ui.menu_button("Risk Management", |ui| {
+                    ui.menu_button("Value-at-Risk", |ui| {
+                        if ui.button("Parametric").clicked() {
+                            println!("> Parametric.");
+                        }
+                        if ui.button("Historical").clicked() {
+                            println!("> Historical.");
+                        }
+                        if ui.button("Monte Carlo Simulation").clicked() {
+                            println!("> Monte Carlo Simulation.");
+                        }
+                    });
+                });
+            });
+        });
+
         egui::SidePanel::left("options").show(ctx, |ui| {
             ui.checkbox(&mut self.lock_x, "Lock x axis").on_hover_text("Check to keep the X axis fixed, i.e., pan and zoom will only affect the Y axis");
             ui.checkbox(&mut self.lock_y, "Lock y axis").on_hover_text("Check to keep the Y axis fixed, i.e., pan and zoom will only affect the X axis");
@@ -73,8 +113,40 @@ impl eframe::App for App {
             ui.label("Portfolio: 100_000");
             ui.label("Orders:");
         });
+        egui::Window::new("Trade Order").min_height(1600.0).min_width(400.0).show(ctx, |ui| {
+            ui.horizontal(|ui| {
+                ui.label("Symbol: ");
+                let mut text = "MSFT".to_string();
+                ui.add(egui::TextEdit::singleline(&mut text));
+            });
+            ui.horizontal(|ui| {
+                ui.label("Price: ");
+                let mut text = "244.55".to_string();
+                ui.add(egui::TextEdit::singleline(&mut text));
+            });
+            ui.horizontal(|ui| {
+                ui.label("Type: ");
+                let mut text = "Limit".to_string();
+                ui.add(egui::TextEdit::singleline(&mut text));
+            });
+            ui.horizontal(|ui| {
+                ui.label("Time: ");
+                let mut text = "GTC - Good till Canceled".to_string();
+                ui.add(egui::TextEdit::singleline(&mut text));
+            });
+            ui.horizontal(|ui| {
+                ui.label("Quantity: ");
+                let mut text = "125.0".to_string();
+                ui.add(egui::TextEdit::singleline(&mut text));
+            });
+            ui.separator();
+            ui.horizontal(|ui| {
+                ui.add(egui::Button::new("BUY"));
+                ui.add(egui::Button::new("SELL"));
+            });
+        });
 
-        egui::CentralPanel::default().show(ctx, |ui| {
+        egui::Window::new("Candle").show(ctx, |ui|{
             let (scroll, pointer_down, modifiers) = ui.input(|i| {
                 let scroll = i.events.iter().find_map(|e| match e {
                     Event::MouseWheel {
@@ -134,15 +206,22 @@ impl eframe::App for App {
                         plot_ui.translate_bounds(pointer_translate);
                     }
                     let mut close_price_array = vec![];
-                    // TODO: remove clone()
                     let data = fetch_box_data(self.candle_data.clone(), &mut close_price_array).expect("fetch csv data error");
                     plot_ui.box_plot(data);
-                    let cash =  PlotPoints::from_explicit_callback(|x| x * 0.0, .., 5000);
-                    plot_ui.line(Line::new(cash).name("Cash"));
-
+                });
+        });
+        egui::Window::new("Portfolio").show(ctx, |ui|{
+            Plot::new("plot")
+                .height(1000.0)
+                .width(2000.0)
+                .allow_zoom(false)
+                .allow_drag(false)
+                .allow_scroll(false)
+                .legend(Legend::default())
+                .show(ui, |plot_ui| {
 
                     let mut circles = Vec::new();
-                    let fps_points: egui_plot::PlotPoints = close_price_array
+                    let fps_points: egui_plot::PlotPoints = self.cash_data.clone()
                         .into_iter()
                         .enumerate()
                         .map(|(i, value)| [i as f64, (value * 0.5) as f64])

@@ -45,6 +45,7 @@ async fn backtest(symbol: &str) -> Result<()> {
         .add_data_feed(symbol)
         // .add_broker(100_000.0)
         .add_strategy(SimpleStrategy {
+            name: "simple".to_string(),
             cash: Vec::from([cash]),
             position: Vec::from([0.0]),
             net_assets:  Vec::from([cash]),

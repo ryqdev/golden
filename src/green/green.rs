@@ -17,7 +17,6 @@ use crate::green::visualization;
 
 #[derive(Default)]
 pub struct Green {
-    // TODO: use Box?
     data: Vec<Vec<f64>>,
     strategy: SimpleStrategy,
     // broker: BackTestBroker,
@@ -61,7 +60,7 @@ impl Green {
         log::info!("{}", self.strategy.net_assets.last().unwrap());
     }
     pub fn plot(&self) {
-        // log::info!("Ploting {:?}...", self.strategy);
+        log::info!("Ploting {:?}...", self.strategy.name);
         let candle_data = self.data.clone();
         let cash_data = self.strategy.cash.clone();
         let net_asset_data = self.strategy.net_assets.clone();
@@ -69,7 +68,7 @@ impl Green {
         // with egui
         let native_options = eframe::NativeOptions::default();
         eframe::run_native(
-            "candlestic chart",
+            "backtest",
             native_options,
             Box::new(|cc| Box::new(visualization::candle::App{
                 value: 1_000.0,

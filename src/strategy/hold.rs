@@ -5,6 +5,7 @@ use crate::green::strategy::Strategy;
 #[derive(Default, Clone, Debug)]
 pub struct SimpleStrategy {
     // broker: BackTestBroker,
+    pub(crate) name: String,
     pub(crate) cash: Vec<f64>,
     pub position: Vec<f64>,
     pub(crate) net_assets: Vec<f64>,
