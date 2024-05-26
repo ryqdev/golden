@@ -12,7 +12,7 @@ use crate::green::{
     broker::backtest::BackTestBroker,
     analyzer::Analyzer
 };
-use crate::strategy::hold::SimpleStrategy;
+use crate::green::strategy::hold::SimpleStrategy;
 use crate::green::visualization;
 
 

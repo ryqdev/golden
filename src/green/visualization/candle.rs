@@ -6,7 +6,7 @@ use eframe::emath::Vec2;
 use egui::{Stroke, Color32, DragValue, Event};
 use egui_plot::{Plot, BoxPlot, BoxElem, BoxSpread, Legend, PlotPoints, Line};
 
-use crate::strategy::hold::Order;
+use crate::green::strategy::hold::Order;
 
 #[derive(Default)]
 pub struct App {

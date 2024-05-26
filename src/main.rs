@@ -4,7 +4,6 @@ use colored::Colorize;
 mod cmds;
 mod green;
 mod err;
-mod strategy;
 
 use crate::{cmds::{Command,
                    backtest::BackTestCommand,

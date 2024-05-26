@@ -6,10 +6,10 @@ use async_trait::async_trait;
 use time::Date;
 use crate::green::{
     green::Green,
-    feeds, strategy, broker
+    feeds, broker
 };
 use crate::green::broker::backtest::BackTestBroker;
-use crate::strategy::hold::SimpleStrategy;
+use crate::green::strategy::hold::SimpleStrategy;
 
 pub struct BackTestCommand;
 
