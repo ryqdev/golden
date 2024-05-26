@@ -67,16 +67,9 @@ impl Green {
 
         let native_options = eframe::NativeOptions::default();
         eframe::run_native(
-            "backtest",
+            &format!("backtest {}", self.strategy.name),
             native_options,
             Box::new(|cc| Box::new(visualization::candle::App{
-                value: 1_000.0,
-                lock_x: false,
-                lock_y: false,
-                ctrl_to_zoom: false,
-                shift_to_horizontal: false,
-                zoom_speed: 0.0,
-                scroll_speed: 0.0,
                 candle_data,
                 cash_data,
                 net_asset_data,
