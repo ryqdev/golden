@@ -65,7 +65,6 @@ impl Green {
         let cash_data = self.strategy.cash.clone();
         let net_asset_data = self.strategy.net_assets.clone();
 
-        // with egui
         let native_options = eframe::NativeOptions::default();
         eframe::run_native(
             "backtest",
