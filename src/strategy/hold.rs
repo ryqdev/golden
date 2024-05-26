@@ -3,13 +3,19 @@ use crate::green::green::Green;
 use crate::green::strategy::Strategy;
 
 #[derive(Default, Clone, Debug)]
+pub(crate) struct Order {
+    pub(crate) symbol: String,
+    pub(crate) size: f64,
+}
+
+#[derive(Default, Clone, Debug)]
 pub struct SimpleStrategy {
     // broker: BackTestBroker,
     pub(crate) name: String,
     pub(crate) cash: Vec<f64>,
     pub position: Vec<f64>,
     pub(crate) net_assets: Vec<f64>,
-
+    pub order: Vec<Order>
 }
 
 impl Strategy for SimpleStrategy {
@@ -30,6 +36,10 @@ impl Strategy for SimpleStrategy {
         self.cash.push(cash - size * price);
         self.position.push(position + size);
         self.net_assets.push(self.cash.last().unwrap() + self.position.last().unwrap() * price);
+        self.order.push(Order{
+            symbol: self.name.to_owned(),
+            size
+        });
     }
 
     fn sell(&mut self, size: f64, price: f64) {
@@ -39,6 +49,10 @@ impl Strategy for SimpleStrategy {
         self.cash.push(cash + size * price);
         self.position.push(position - size);
         self.net_assets.push(self.cash.last().unwrap() + self.position.last().unwrap() * price);
+        self.order.push(Order{
+            symbol: self.name.to_owned(),
+            size
+        });
     }
 
 }

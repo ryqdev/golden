@@ -48,6 +48,7 @@ async fn backtest(symbol: &str) -> Result<()> {
             cash: Vec::from([cash]),
             position: Vec::from([0.0]),
             net_assets:  Vec::from([cash]),
+            order: vec![],
         })
         .build();
 

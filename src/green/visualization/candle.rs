@@ -6,12 +6,14 @@ use eframe::emath::Vec2;
 use egui::{Stroke, Color32, DragValue, Event};
 use egui_plot::{Plot, BoxPlot, BoxElem, BoxSpread, Legend, PlotPoints, Line};
 
+use crate::strategy::hold::Order;
 
 #[derive(Default)]
 pub struct App {
     pub(crate) candle_data: Vec<Vec<f64>>,
     pub cash_data: Vec<f64>,
     pub net_asset_data: Vec<f64>,
+    pub order_data: Vec<Order>
 }
 
 fn fetch_box_data(candle_data: Vec<Vec<f64>>) -> anyhow::Result<BoxPlot> {
@@ -71,41 +73,15 @@ impl eframe::App for App {
         });
 
         egui::SidePanel::right("portfolio")
-            .resizable(true)
-            .default_width(1000f32)
+            .default_width(1920f32)
             .show(ctx, |ui| {
                 ui.label("Portfolio: 100_000");
                 ui.label("Orders:");
-                ui.horizontal(|ui| {
-                    ui.label("Symbol: ");
-                    let mut text = "MSFT".to_string();
-                    ui.add(egui::TextEdit::singleline(&mut text));
-                });
-                ui.horizontal(|ui| {
-                    ui.label("Price: ");
-                    let mut text = "244.55".to_string();
-                    ui.add(egui::TextEdit::singleline(&mut text));
-                });
-                ui.horizontal(|ui| {
-                    ui.label("Type: ");
-                    let mut text = "Limit".to_string();
-                    ui.add(egui::TextEdit::singleline(&mut text));
-                });
-                ui.horizontal(|ui| {
-                    ui.label("Time: ");
-                    let mut text = "GTC - Good till Canceled".to_string();
-                    ui.add(egui::TextEdit::singleline(&mut text));
-                });
-                ui.horizontal(|ui| {
-                    ui.label("Quantity: ");
-                    let mut text = "125.0".to_string();
-                    ui.add(egui::TextEdit::singleline(&mut text));
-                });
-                ui.separator();
-                ui.horizontal(|ui| {
-                    ui.add(egui::Button::new("BUY"));
-                    ui.add(egui::Button::new("SELL"));
-                });
+                // for order in &self.order_data {
+                //     ui.horizontal(|ui| {
+                //         ui.label(order.size.to_string());
+                //     });
+                // }
             });
 
         egui::Window::new("Candle")

@@ -1,3 +1,4 @@
+use std::collections::hash_set::SymmetricDifference;
 use std::collections::VecDeque;
 use std::default::Default;
 use std::fs::File;
@@ -21,6 +22,7 @@ pub struct Green {
     strategy: SimpleStrategy,
     // broker: BackTestBroker,
 }
+
 
 #[derive(Default)]
 pub struct GreenBuilder {
@@ -64,6 +66,7 @@ impl Green {
         let candle_data = self.data.clone();
         let cash_data = self.strategy.cash.clone();
         let net_asset_data = self.strategy.net_assets.clone();
+        let order_data = self.strategy.order.clone();
 
         let native_options = eframe::NativeOptions::default();
         eframe::run_native(
@@ -73,6 +76,7 @@ impl Green {
                 candle_data,
                 cash_data,
                 net_asset_data,
+                order_data
             })),
         ).expect("Plotting error");
     }
