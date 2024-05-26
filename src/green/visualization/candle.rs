@@ -70,87 +70,93 @@ impl eframe::App for App {
             });
         });
 
-        egui::SidePanel::right("portfolio").show(ctx, |ui| {
-            ui.label("Portfolio: 100_000");
-            ui.label("Orders:");
-        });
-
-        egui::Window::new("Trade Order").min_height(1600.0).min_width(400.0).show(ctx, |ui| {
-            ui.horizontal(|ui| {
-                ui.label("Symbol: ");
-                let mut text = "MSFT".to_string();
-                ui.add(egui::TextEdit::singleline(&mut text));
-            });
-            ui.horizontal(|ui| {
-                ui.label("Price: ");
-                let mut text = "244.55".to_string();
-                ui.add(egui::TextEdit::singleline(&mut text));
-            });
-            ui.horizontal(|ui| {
-                ui.label("Type: ");
-                let mut text = "Limit".to_string();
-                ui.add(egui::TextEdit::singleline(&mut text));
-            });
-            ui.horizontal(|ui| {
-                ui.label("Time: ");
-                let mut text = "GTC - Good till Canceled".to_string();
-                ui.add(egui::TextEdit::singleline(&mut text));
-            });
-            ui.horizontal(|ui| {
-                ui.label("Quantity: ");
-                let mut text = "125.0".to_string();
-                ui.add(egui::TextEdit::singleline(&mut text));
-            });
-            ui.separator();
-            ui.horizontal(|ui| {
-                ui.add(egui::Button::new("BUY"));
-                ui.add(egui::Button::new("SELL"));
-            });
-        });
-
-        egui::Window::new("Candle").show(ctx, |ui|{
-            ui.label("Candle");
-
-            Plot::new("plot")
-                .legend(Legend::default())
-                .height(1000.0)
-                .width(2000.0)
-                .show(ui, |plot_ui| {
-                    let data = fetch_box_data(self.candle_data.clone()).expect("fetch csv data error");
-                    plot_ui.box_plot(data);
+        egui::SidePanel::right("portfolio")
+            .resizable(true)
+            .show(ctx, |ui| {
+                ui.label("Portfolio: 100_000");
+                ui.label("Orders:");
+                ui.horizontal(|ui| {
+                    ui.label("Symbol: ");
+                    let mut text = "MSFT".to_string();
+                    ui.add(egui::TextEdit::singleline(&mut text));
                 });
-        });
-
-        egui::Window::new("Portfolio").show(ctx, |ui|{
-            Plot::new("plot")
-                .legend(Legend::default())
-                .height(1000.0)
-                .width(2000.0)
-                .show(ui, |plot_ui| {
-                    let cash_line: egui_plot::PlotPoints = self.cash_data.clone()
-                        .into_iter()
-                        .enumerate()
-                        .map(|(i, value)| [i as f64, (value * 1.0) as f64])
-                        .collect();
-                    plot_ui.line(
-                        Line::new(cash_line)
-                            .color(Color32::GREEN)
-                            .width(2.0)
-                            .name("Total Assets")
-                    );
-
-                    let net_asset_line: egui_plot::PlotPoints = self.net_asset_data.clone()
-                        .into_iter()
-                        .enumerate()
-                        .map(|(i, value)| [i as f64, (value * 1.0) as f64])
-                        .collect();
-                    plot_ui.line(
-                        Line::new(net_asset_line)
-                            .color(Color32::BLUE)
-                            .width(2.0)
-                            .name("Net Assets")
-                    );
+                ui.horizontal(|ui| {
+                    ui.label("Price: ");
+                    let mut text = "244.55".to_string();
+                    ui.add(egui::TextEdit::singleline(&mut text));
                 });
-        });
+                ui.horizontal(|ui| {
+                    ui.label("Type: ");
+                    let mut text = "Limit".to_string();
+                    ui.add(egui::TextEdit::singleline(&mut text));
+                });
+                ui.horizontal(|ui| {
+                    ui.label("Time: ");
+                    let mut text = "GTC - Good till Canceled".to_string();
+                    ui.add(egui::TextEdit::singleline(&mut text));
+                });
+                ui.horizontal(|ui| {
+                    ui.label("Quantity: ");
+                    let mut text = "125.0".to_string();
+                    ui.add(egui::TextEdit::singleline(&mut text));
+                });
+                ui.separator();
+                ui.horizontal(|ui| {
+                    ui.add(egui::Button::new("BUY"));
+                    ui.add(egui::Button::new("SELL"));
+                });
+            });
+
+        egui::Window::new("Candle")
+            .fixed_pos(egui::pos2(0f32, 0f32))
+            .fixed_size(egui::vec2(1920f32, 1080f32))
+            .pivot(egui::Align2::CENTER_CENTER)
+            .show(ctx, |ui|{
+                ui.label("Candle");
+
+                Plot::new("plot")
+                    .legend(Legend::default())
+                    .height(1000.0)
+                    .width(2000.0)
+                    .show(ui, |plot_ui| {
+                        let data = fetch_box_data(self.candle_data.clone()).expect("fetch csv data error");
+                        plot_ui.box_plot(data);
+                    });
+            });
+
+        egui::Window::new("Portfolio")
+            .fixed_pos(egui::pos2(0f32, 1080f32))
+            .fixed_size(egui::vec2(1920f32, 1080f32))
+            .show(ctx, |ui|{
+                Plot::new("plot")
+                    .legend(Legend::default())
+                    .height(1000.0)
+                    .width(2000.0)
+                    .show(ui, |plot_ui| {
+                        let cash_line: egui_plot::PlotPoints = self.cash_data.clone()
+                            .into_iter()
+                            .enumerate()
+                            .map(|(i, value)| [i as f64, (value * 1.0) as f64])
+                            .collect();
+                        plot_ui.line(
+                            Line::new(cash_line)
+                                .color(Color32::GREEN)
+                                .width(2.0)
+                                .name("Total Assets")
+                        );
+
+                        let net_asset_line: egui_plot::PlotPoints = self.net_asset_data.clone()
+                            .into_iter()
+                            .enumerate()
+                            .map(|(i, value)| [i as f64, (value * 1.0) as f64])
+                            .collect();
+                        plot_ui.line(
+                            Line::new(net_asset_line)
+                                .color(Color32::BLUE)
+                                .width(2.0)
+                                .name("Net Assets")
+                        );
+                    });
+            });
     }
 }
