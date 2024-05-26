@@ -29,17 +29,16 @@ impl Command for BackTestCommand {
     }
 
     async fn handler(m: &ArgMatches) -> Result<()> {
-        log::info!("Handle backtest");
         let symbol = m.get_one::<String>("symbol").unwrap();
+        log::info!("Handle backtest {symbol}");
         backtest(symbol).await?;
         Ok(())
     }
 
 }
 
-
 async fn backtest(symbol: &str) -> Result<()> {
-    log::info!("Backtesting {}...", symbol);
+    log::info!("Backtesting {symbol}...");
     let cash = 10_000.0;
     let mut green = Green::new()
         .add_data_feed(symbol)
