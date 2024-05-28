@@ -6,7 +6,6 @@ use std::fs::File;
 use ibapi::orders::{order_builder, OrderNotification};
 
 use crate::cmds::backtest::BackTestCommand;
-use crate::err::Error;
 use crate::green::{
     feeds::BaseData,
     strategy::{
