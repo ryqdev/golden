@@ -2,57 +2,40 @@ use crate::green::broker::backtest::BackTestBroker;
 use crate::green::green::Green;
 use crate::green::strategy::Strategy;
 
+#[derive(Debug, Default, Copy, Clone)]
+pub enum Action {
+    #[default]
+    None,
+    Buy,
+    Sell,
+}
+
+
 #[derive(Default, Clone, Debug)]
 pub(crate) struct Order {
-    pub(crate) symbol: String,
+    pub action: Action,
     pub(crate) size: f64,
 }
 
 #[derive(Default, Clone, Debug)]
-pub struct SimpleStrategy {
-    // broker: BackTestBroker,
-    pub(crate) name: String,
-    pub(crate) cash: Vec<f64>,
-    pub position: Vec<f64>,
-    pub(crate) net_assets: Vec<f64>,
-    pub order: Vec<Order>
-}
+pub struct SimpleStrategy {}
 
 impl Strategy for SimpleStrategy {
-    fn next(&mut self, data: &Vec<f64>) {
+    fn next(&mut self, data: &Vec<f64>) -> Order {
         let open_price = data[0];
         let close_price = data[3];
         if close_price > open_price {
-            self.buy(1.0, close_price);
+            log::info!("buy");
+            Order{
+                action: Action::Buy,
+                size: 1.0
+            }
         } else {
-            self.sell(1.0, close_price);
+            log::info!("sell");
+            Order{
+                action: Action::Sell,
+                size: 1.0
+            }
         }
     }
-
-    fn buy(&mut self, size: f64, price: f64) {
-        log::info!("buy");
-        let cash = self.cash.last().unwrap();
-        let position = self.position.last().unwrap();
-        self.cash.push(cash - size * price);
-        self.position.push(position + size);
-        self.net_assets.push(self.cash.last().unwrap() + self.position.last().unwrap() * price);
-        self.order.push(Order{
-            symbol: self.name.to_owned(),
-            size
-        });
-    }
-
-    fn sell(&mut self, size: f64, price: f64) {
-        log::info!("sell");
-        let cash = self.cash.last().unwrap();
-        let position = self.position.last().unwrap();
-        self.cash.push(cash + size * price);
-        self.position.push(position - size);
-        self.net_assets.push(self.cash.last().unwrap() + self.position.last().unwrap() * price);
-        self.order.push(Order{
-            symbol: self.name.to_owned(),
-            size
-        });
-    }
-
 }

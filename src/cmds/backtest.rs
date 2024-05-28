@@ -30,7 +30,7 @@ impl Command for BackTestCommand {
 
     async fn handler(m: &ArgMatches) -> Result<()> {
         let symbol = m.get_one::<String>("symbol").unwrap();
-        log::info!("Handle backtest {symbol}");
+        log::info!("Backtest {symbol}");
         backtest(symbol).await?;
         Ok(())
     }
@@ -38,18 +38,10 @@ impl Command for BackTestCommand {
 }
 
 async fn backtest(symbol: &str) -> Result<()> {
-    log::info!("Backtesting {symbol}...");
-    let cash = 10_000.0;
     let mut green = Green::new()
         .add_data_feed(symbol)
-        // .add_broker(100_000.0)
-        .add_strategy(SimpleStrategy {
-            name: "simple".to_string(),
-            cash: Vec::from([cash]),
-            position: Vec::from([0.0]),
-            net_assets:  Vec::from([cash]),
-            order: vec![],
-        })
+        .add_broker(100_000.0)
+        .add_strategy(SimpleStrategy{})
         .build();
 
     green.run();

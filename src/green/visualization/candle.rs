@@ -79,7 +79,7 @@ impl eframe::App for App {
                 ui.label("Orders:");
                 // for order in &self.order_data {
                 //     ui.horizontal(|ui| {
-                //         ui.label(order.size.to_string());
+                //         ui.label(order.size.to_owned());
                 //     });
                 // }
             });

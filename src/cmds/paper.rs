@@ -78,10 +78,10 @@ async fn paper_trading(){
 
 
     let contract = Contract {
-        symbol: "USD".to_string(),
+        symbol: "USD".to_owned(),
         security_type: SecurityType::ForexPair,
-        currency: "JPY".to_string(),
-        exchange: "IDEALPRO".to_string(),
+        currency: "JPY".to_owned(),
+        exchange: "IDEALPRO".to_owned(),
         ..Default::default()
     };
 
@@ -99,9 +99,9 @@ async fn paper_trading(){
         }
 
         let action = if bar.close > channel.high() {
-            Action::Buy
-        } else if bar.close < channel.low() {
             Action::Sell
+        } else if bar.close < channel.low() {
+            Action::Buy
         } else {
             continue;
         };

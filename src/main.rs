@@ -19,7 +19,7 @@ fn init_log() {
                 "{}:{} {} [{}] - {}",
                 record.file().unwrap_or("unknown_file"),
                 record.line().unwrap_or(0),
-                chrono::Local::now().format("%Y-%m-%dT%H:%M:%S").to_string().blue(),
+                chrono::Local::now().format("%Y-%m-%dT%H:%M:%S").to_owned().blue(),
                 record.level(),
                 record.args()
             )

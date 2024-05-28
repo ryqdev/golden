@@ -12,7 +12,7 @@ use crate::green::{
     broker::backtest::BackTestBroker,
     analyzer::Analyzer
 };
-use crate::green::strategy::hold::SimpleStrategy;
+use crate::green::strategy::hold::{Order, SimpleStrategy};
 use crate::green::visualization;
 
 
@@ -20,7 +20,7 @@ use crate::green::visualization;
 pub struct Green {
     data: Vec<Vec<f64>>,
     strategy: SimpleStrategy,
-    // broker: BackTestBroker,
+    broker: BackTestBroker,
 }
 
 
@@ -28,7 +28,7 @@ pub struct Green {
 pub struct GreenBuilder {
     data: Vec<Vec<f64>>,
     strategy: SimpleStrategy,
-    // broker: BackTestBroker
+    broker: BackTestBroker
 }
 
 impl Green {
@@ -40,33 +40,36 @@ impl Green {
     pub fn run(&mut self) {
         log::info!("Running {:?}...", self.strategy);
         for bar in self.data.iter() {
-            // log::info!("\x1b[93m bar:\x1b[0m {:?} ", bar);
-            self.strategy.next(bar);
-            // let action = Action::Buy;
-            //
-            // // TODO: build the client
-            // let order_id = client.next_order_id();
-            // let order = order_builder::market_order(action, 1000.0);
-            //
-            // let notices = client.place_order(order_id, &contract, &order).unwrap();
-            // for notice in notices {
-            //     if let OrderNotification::ExecutionData(data) = notice {
-            //         println!("{} {} shares of {}", data.execution.side, data.execution.shares, data.contract.symbol);
-            //     } else {
-            //         println!("{:?}", notice);
-            //     }
-            // }
+            let order = self.strategy.next(bar);
+            let cash = self.broker.cash.last().unwrap();
+            let position = self.broker.position.last().unwrap();
+            let price = bar[3];
+            // TODO: Action is not the struct I defined
+            match order.action {
+                Action::Buy => {
+                    self.broker.cash.push(cash - order.size * price);
+                    self.broker.position.push(position + order.size);
+                    self.broker.net_assets.push(self.broker.cash.last().unwrap() + self.broker.position.last().unwrap() * price);
+                    self.broker.order.push(order)
+                }
+                Action::Sell => {
+                    self.broker.cash.push(cash + order.size * price);
+                    self.broker.position.push(position - order.size);
+                    self.broker.net_assets.push(self.broker.cash.last().unwrap() + self.broker.position.last().unwrap() * price);
+                    self.broker.order.push(order)
+                }
+                _ => {
+                    todo!()
+                }
+            }
         }
-        log::info!("{}", self.strategy.cash.last().unwrap());
-        log::info!("{}", self.strategy.position.last().unwrap());
-        log::info!("{}", self.strategy.net_assets.last().unwrap());
     }
     pub fn plot(&self) {
-        log::info!("Ploting {:?}...", self.strategy.name);
+        log::info!("Plotting {:?}...", self.strategy);
         let candle_data = self.data.clone();
-        let cash_data = self.strategy.cash.clone();
-        let net_asset_data = self.strategy.net_assets.clone();
-        let order_data = self.strategy.order.clone();
+        let cash_data = self.broker.cash.clone();
+        let net_asset_data = self.broker.net_assets.clone();
+        let order_data = self.broker.order.clone();
 
         let native_options = eframe::NativeOptions::default();
         eframe::run_native(
@@ -80,9 +83,6 @@ impl Green {
             })),
         ).expect("Plotting error");
     }
-    // fn run_strategy(&self){
-    //     self.broker.set_cash(XXX)
-    // }
 }
 
 // TODO: add more types in HistoricalData
@@ -108,14 +108,15 @@ impl GreenBuilder{
         self.data = finance_data;
         self
     }
-    // pub fn add_broker(&mut self, cash: f64) -> &mut GreenBuilder {
-    //     self.broker = BackTestBroker{
-    //         cash: Vec::from([cash]),
-    //         position: Vec::from([0.0]),
-    //         net_assets:  Vec::from([cash]),
-    //     };
-    //     self
-    // }
+    pub fn add_broker(&mut self, cash: f64) -> &mut GreenBuilder {
+        self.broker = BackTestBroker{
+            cash: Vec::from([cash]),
+            position: Vec::from([0.0]),
+            net_assets:  Vec::from([cash]),
+            order: vec![],
+        };
+        self
+    }
     pub fn add_strategy(&mut self, strategy: SimpleStrategy) -> &mut GreenBuilder{
         self.strategy = strategy;
         self
@@ -127,7 +128,7 @@ impl GreenBuilder{
         Box::new(Green{
             data: self.data.clone(),
             strategy: self.strategy.clone(),
-            // broker: self.broker.clone()
+            broker: self.broker.clone()
         })
     }
 }
