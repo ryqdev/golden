@@ -77,9 +77,7 @@ impl Green {
                     self.broker.net_assets.push(self.broker.cash.last().unwrap() + self.broker.position.last().unwrap() * close_price);
                     self.broker.order.push(order)
                 }
-                _ => {
-                    log::info!("Order: {:?}", order)
-                }
+                _ => ()
             }
         }
     }
