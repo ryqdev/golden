@@ -1,21 +1,7 @@
 use crate::green::broker::backtest::BackTestBroker;
-use crate::green::green::Green;
+use crate::green::green::{Action, Green, Order};
 use crate::green::strategy::Strategy;
 
-#[derive(Debug, Default, Copy, Clone)]
-pub enum Action {
-    #[default]
-    None,
-    Buy,
-    Sell,
-}
-
-
-#[derive(Default, Clone, Debug)]
-pub(crate) struct Order {
-    pub action: Action,
-    pub(crate) size: f64,
-}
 
 #[derive(Default, Clone, Debug)]
 pub struct SimpleStrategy {}

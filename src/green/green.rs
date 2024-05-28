@@ -2,7 +2,7 @@ use std::collections::hash_set::SymmetricDifference;
 use std::collections::VecDeque;
 use std::default::Default;
 use std::fs::File;
-use ibapi::orders::{Action, order_builder, OrderNotification};
+use ibapi::orders::{order_builder, OrderNotification};
 use crate::cmds::backtest::BackTestCommand;
 use crate::err::Error;
 use crate::green::{
@@ -12,8 +12,23 @@ use crate::green::{
     broker::backtest::BackTestBroker,
     analyzer::Analyzer
 };
-use crate::green::strategy::hold::{Order, SimpleStrategy};
+use crate::green::strategy::hold::{SimpleStrategy};
 use crate::green::visualization;
+
+#[derive(Debug, Default, Copy, Clone)]
+pub enum Action {
+    #[default]
+    None,
+    Buy,
+    Sell,
+}
+
+
+#[derive(Default, Clone, Debug)]
+pub(crate) struct Order {
+    pub action: Action,
+    pub(crate) size: f64,
+}
 
 
 #[derive(Default)]
@@ -43,23 +58,22 @@ impl Green {
             let order = self.strategy.next(bar);
             let cash = self.broker.cash.last().unwrap();
             let position = self.broker.position.last().unwrap();
-            let price = bar[3];
-            // TODO: Action is not the struct I defined
+            let close_price = bar.last().unwrap();
             match order.action {
                 Action::Buy => {
-                    self.broker.cash.push(cash - order.size * price);
+                    self.broker.cash.push(cash - order.size * close_price);
                     self.broker.position.push(position + order.size);
-                    self.broker.net_assets.push(self.broker.cash.last().unwrap() + self.broker.position.last().unwrap() * price);
+                    self.broker.net_assets.push(self.broker.cash.last().unwrap() + self.broker.position.last().unwrap() * close_price);
                     self.broker.order.push(order)
                 }
                 Action::Sell => {
-                    self.broker.cash.push(cash + order.size * price);
+                    self.broker.cash.push(cash + order.size * close_price);
                     self.broker.position.push(position - order.size);
-                    self.broker.net_assets.push(self.broker.cash.last().unwrap() + self.broker.position.last().unwrap() * price);
+                    self.broker.net_assets.push(self.broker.cash.last().unwrap() + self.broker.position.last().unwrap() * close_price);
                     self.broker.order.push(order)
                 }
                 _ => {
-                    todo!()
+                    log::info!("Order: {:?}", order)
                 }
             }
         }
@@ -73,7 +87,7 @@ impl Green {
 
         let native_options = eframe::NativeOptions::default();
         eframe::run_native(
-            &format!("backtest {}", self.strategy.name),
+            &format!("backtest {:?}", self.strategy),
             native_options,
             Box::new(|cc| Box::new(visualization::candle::App{
                 candle_data,
