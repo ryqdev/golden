@@ -1,12 +1,7 @@
-use std::{
-    fs::File
-};
-use eframe::emath::Vec2;
+use egui::{Stroke, Color32};
+use egui_plot::{Plot, BoxPlot, BoxElem, BoxSpread, Legend, Line};
 
-use egui::{Stroke, Color32, DragValue, Event};
-use egui_plot::{Plot, BoxPlot, BoxElem, BoxSpread, Legend, PlotPoints, Line};
-
-use crate::green::strategy::hold::Order;
+use crate::green::green::Order;
 
 #[derive(Default)]
 pub struct App {

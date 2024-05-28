@@ -2,18 +2,22 @@ use std::collections::hash_set::SymmetricDifference;
 use std::collections::VecDeque;
 use std::default::Default;
 use std::fs::File;
+
 use ibapi::orders::{order_builder, OrderNotification};
+
 use crate::cmds::backtest::BackTestCommand;
 use crate::err::Error;
 use crate::green::{
     feeds::BaseData,
-    strategy::Strategy,
+    strategy::{
+        Strategy,
+        hold::{SimpleStrategy}
+    },
     broker::Broker,
     broker::backtest::BackTestBroker,
-    analyzer::Analyzer
+    analyzer::Analyzer,
+    visualization
 };
-use crate::green::strategy::hold::{SimpleStrategy};
-use crate::green::visualization;
 
 #[derive(Debug, Default, Copy, Clone)]
 pub enum Action {
@@ -61,12 +65,14 @@ impl Green {
             let close_price = bar.last().unwrap();
             match order.action {
                 Action::Buy => {
+                    log::info!("Buy: {:?}", order);
                     self.broker.cash.push(cash - order.size * close_price);
                     self.broker.position.push(position + order.size);
                     self.broker.net_assets.push(self.broker.cash.last().unwrap() + self.broker.position.last().unwrap() * close_price);
                     self.broker.order.push(order)
                 }
                 Action::Sell => {
+                    log::info!("Sell: {:?}", order);
                     self.broker.cash.push(cash + order.size * close_price);
                     self.broker.position.push(position - order.size);
                     self.broker.net_assets.push(self.broker.cash.last().unwrap() + self.broker.position.last().unwrap() * close_price);
@@ -135,9 +141,9 @@ impl GreenBuilder{
         self.strategy = strategy;
         self
     }
-    pub fn add_analyzer(&mut self, analyzer: Box<dyn Analyzer>) -> &GreenBuilder {
-        self
-    }
+    // pub fn add_analyzer(&mut self, analyzer: Box<dyn Analyzer>) -> &GreenBuilder {
+    //     self
+    // }
     pub fn build(&self) -> Box<Green> {
         Box::new(Green{
             data: self.data.clone(),

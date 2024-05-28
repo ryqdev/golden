@@ -15,7 +15,6 @@ type HistoricalData = (String, Vec<f64>, usize);
 
 impl YahooFinanceData{
     fn fetch_csv_data(symbol: &str) -> anyhow::Result<Vec<Vec<f64>>> {
-        // Date,Open,High,Low,Close,Adj Close,Volume
         let file = File::open(format!("data/{symbol}.csv"))?;
 
         let mut reader = csv::ReaderBuilder::new()
