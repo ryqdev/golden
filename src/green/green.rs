@@ -102,7 +102,6 @@ impl Green {
     }
 }
 
-// TODO: add more types in HistoricalData
 type HistoricalData = (String, Vec<f64>);
 
 impl GreenBuilder{

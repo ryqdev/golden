@@ -39,6 +39,7 @@ impl Command for BackTestCommand {
 
 async fn backtest(symbol: &str) -> Result<()> {
     let mut green = Green::new()
+        // TODO: how to identify different modes
         .add_data_feed(symbol)
         .add_broker(100_000.0)
         .add_strategy(SimpleStrategy{})
