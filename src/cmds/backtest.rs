@@ -42,7 +42,7 @@ async fn backtest(symbol: &str) -> Result<()> {
         .add_data_feed(symbol)
         .add_broker(100_000.0)
         .add_strategy(SimpleStrategy{})
-        .build();
+        .init();
 
     green.run();
     green.plot();

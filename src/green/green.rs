@@ -141,7 +141,7 @@ impl GreenBuilder{
     // pub fn add_analyzer(&mut self, analyzer: Box<dyn Analyzer>) -> &GreenBuilder {
     //     self
     // }
-    pub fn build(&self) -> Box<Green> {
+    pub fn init(&self) -> Box<Green> {
         Box::new(Green{
             data: self.data.clone(),
             strategy: self.strategy.clone(),
