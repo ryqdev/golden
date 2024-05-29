@@ -105,7 +105,7 @@ impl Green {
 type HistoricalData = (String, Vec<f64>);
 
 impl GreenBuilder{
-    pub fn add_data_feed(&mut self, symbol: &str) -> &mut GreenBuilder{
+    pub fn add_data_feed(&mut self, symbol: Box<dyn BaseData>) -> &mut GreenBuilder{
         let file = File::open(format!("data/{symbol}.csv")).unwrap();
 
         let mut reader = csv::ReaderBuilder::new()
