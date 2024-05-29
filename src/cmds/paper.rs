@@ -78,9 +78,9 @@ async fn paper_trading(){
 
 
     let contract = Contract {
-        symbol: "JPY".to_owned(),
+        symbol: "USD".to_owned(),
         security_type: SecurityType::ForexPair,
-        currency: "USD".to_owned(),
+        currency: "JPY".to_owned(),
         exchange: "IDEALPRO".to_owned(),
         ..Default::default()
     };

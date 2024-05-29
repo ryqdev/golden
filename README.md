@@ -15,6 +15,7 @@ All in one trading engine
 ### Paper trading & live trading
 - [x] Single live broker: IBKR
 - [x] Live trading with single broker
+- [ ] Async 
 
 ## Demo
 ```shell

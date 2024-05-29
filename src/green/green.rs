@@ -57,6 +57,9 @@ impl Green {
     }
     pub fn run(&mut self) {
         log::info!("Running {:?}...", self.strategy);
+
+        //! .iter()     : borrows the ownership
+        //! .into_iter(): transfers the ownership
         for bar in self.data.iter() {
             let order = self.strategy.next(bar);
             let cash = self.broker.cash.last().unwrap();
@@ -105,7 +108,7 @@ impl Green {
 type HistoricalData = (String, Vec<f64>);
 
 impl GreenBuilder{
-    pub fn add_data_feed(&mut self, symbol: Box<dyn BaseData>) -> &mut GreenBuilder{
+    pub fn add_data_feed(&mut self, symbol: &str) -> &mut GreenBuilder{
         let file = File::open(format!("data/{symbol}.csv")).unwrap();
 
         let mut reader = csv::ReaderBuilder::new()
@@ -115,6 +118,8 @@ impl GreenBuilder{
         let mut finance_data = vec![];
         for result in reader.deserialize() {
             let record: HistoricalData = result.unwrap();
+            // use record.1[2] rather than record.1.get(2)
+            // to get higher performance
             let low = record.1[2];
             let open = record.1[0];
             let close = record.1[3];
