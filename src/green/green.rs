@@ -207,12 +207,32 @@ fn fetch_csv_data(symbol: &str) -> impl Iterator<Item = Bar> {
         .from_reader(csv_file)
         .deserialize();
 
-    reader.map(|record:(String, Vec<f64>)| Bar{
+    // TODO: Why move here
+    reader.map(move |record:(String, Vec<f64>)| Bar{
         date: OffsetDateTime::now_utc(),
         open: record.1[0],
         high: record.1[1],
         low: record.1[2],
         close: record.1[3],
+        volume: 0.0,
+        wap: 0.0,
+        count: 0,
+    })
+
+}
+
+fn bar_from_csv<T>(
+    csv_reader: impl Iterator<Item = XXXX>
+) -> impl Iterator<Item = Bar>
+where T: XXXX
+{
+    // TODO:
+    csv_reader.map(move |r| Bar{
+        date: OffsetDateTime::now_utc(),
+        open: r.1[0],
+        high: r.1[1],
+        low: r.1[2],
+        close: r.1[3],
         volume: 0.0,
         wap: 0.0,
         count: 0,
