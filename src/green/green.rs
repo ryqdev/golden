@@ -125,7 +125,7 @@ impl Green {
 
 
 impl GreenBuilder {
-    pub fn add_data_feed(&mut self, symbol: &str) -> &mut GreenBuilder{
+    pub fn set_data_feed(&mut self, symbol: &str) -> &mut GreenBuilder{
         // TODO: refactor code
         let contract = Contract {
             symbol: "USD".to_owned(),
@@ -146,7 +146,7 @@ impl GreenBuilder {
         self.mode = mode;
         self
     }
-    pub fn add_broker(&mut self, cash: f64) -> &mut GreenBuilder {
+    pub fn set_broker(&mut self, cash: f64) -> &mut GreenBuilder {
         self.broker = match self.mode {
             GreenModeType::Backtest => BackTestBroker{
                 cash: Vec::from([cash]),
@@ -159,7 +159,7 @@ impl GreenBuilder {
         };
         self
     }
-    pub fn add_strategy(&mut self, strategy: SimpleStrategy) -> &mut GreenBuilder{
+    pub fn set_strategy(&mut self, strategy: SimpleStrategy) -> &mut GreenBuilder{
         self.strategy = strategy;
         self
     }

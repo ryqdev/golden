@@ -44,6 +44,6 @@ async fn main() -> anyhow::Result<()> {
         Some(("backtest", sub_m)) => Ok(BackTestCommand::handler(sub_m).await?),
         Some(("paper-trading", sub_m)) => Ok(PaperTradingCommand::handler(sub_m).await?),
         Some(("live-trading", sub_m)) => Ok(LiveTradingCommand::handler(sub_m).await?),
-        _ => Err(anyhow::Error::msg("Miss arguments. Please access Makefile to get instructions")),
+        _ => Err(anyhow::Error::msg("Miss arguments. Please open Makefile to get instructions")),
     }
 }

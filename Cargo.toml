@@ -26,3 +26,6 @@ egui_plot = "0.27.2"
 eframe = "0.27.2"
 ibapi = "0.4.3"
 colored = "2.1.0"
+tungstenite = {version="0.21.0", features=["native-tls"]}
+url = "2.5.0"
+serde_json = "1.0.117"

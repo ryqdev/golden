@@ -15,7 +15,8 @@ All in one trading engine
 ### Paper trading & live trading
 - [x] Single live broker: IBKR
 - [x] Live trading with single broker
-- [ ] Async 
+- [ ] AsyncIO
+- [ ] Websocket: Constant polling is not recommended to get real-time market data. Use websocket instead
 
 ## Demo
 ```shell

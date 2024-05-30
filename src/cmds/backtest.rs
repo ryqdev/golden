@@ -42,9 +42,9 @@ impl Command for BackTestCommand {
 async fn backtest(symbol: &str) -> Result<()> {
     let mut green = Green::new()
         .set_mode(GreenModeType::Backtest)
-        .add_broker(100_000.0)
-        .add_data_feed(symbol)
-        .add_strategy(SimpleStrategy{})
+        .set_broker(100_000.0)
+        .set_data_feed(symbol)
+        .set_strategy(SimpleStrategy{})
         .build();
 
     green.run();
