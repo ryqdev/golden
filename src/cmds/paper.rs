@@ -50,21 +50,6 @@ impl BreakoutChannel {
 
 async fn paper_trading(){
     log::info!("Paper trading...");
-    // let cash = 10_000.0;
-    // let mut green = Green::new()
-    //     .add_data_feed(symbol)
-    //     // .add_broker(100_000.0)
-    //     .add_strategy(SimpleStrategy {
-    //         name: "simple".to_string(),
-    //         cash: Vec::from([cash]),
-    //         position: Vec::from([0.0]),
-    //         net_assets:  Vec::from([cash]),
-    //         order: vec![],
-    //     })
-    //     .build();
-    //
-    // green.run();
-    // green.plot();
 
     let client = Client::connect("127.0.0.1:7497", 100).unwrap();
 

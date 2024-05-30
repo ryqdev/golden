@@ -1,15 +1,16 @@
-use crate::green::green::{Action, Order};
-use crate::green::strategy::Strategy;
+use crate::green::{
+    green::{Action, Order, Bar},
+    strategy::Strategy
+};
+
 
 
 #[derive(Default, Clone, Debug)]
 pub struct SimpleStrategy {}
 
 impl Strategy for SimpleStrategy {
-    fn next(&mut self, data: &Vec<f64>) -> Order {
-        let open_price = data[0];
-        let close_price = data[3];
-        if close_price > open_price {
+    fn next(&mut self, data: &Bar) -> Order {
+        if data.close >  data.open {
             Order{
                 action: Action::Buy,
                 size: 1.0

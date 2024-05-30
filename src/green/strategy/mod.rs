@@ -1,8 +1,13 @@
 pub mod hold;
 
-use crate::green::broker::Broker;
-use crate::green::green::Order;
+use crate::green::{
+    broker::Broker,
+    green::{
+        Order,
+        Bar
+    },
+};
 
 pub trait Strategy {
-    fn next(&mut self, _: &Vec<f64>) -> Order;
+    fn next(&mut self, _: &Bar) -> Order;
 }

@@ -9,6 +9,8 @@ use crate::green::{
     feeds, broker
 };
 use crate::green::broker::backtest::BackTestBroker;
+use crate::green::green::DataType::Backtest;
+use crate::green::green::GreenModeType;
 use crate::green::strategy::hold::SimpleStrategy;
 
 pub struct BackTestCommand;
@@ -39,11 +41,11 @@ impl Command for BackTestCommand {
 
 async fn backtest(symbol: &str) -> Result<()> {
     let mut green = Green::new()
-        // TODO: how to identify different modes
-        .add_data_feed(symbol)
+        .set_mode(GreenModeType::Backtest)
         .add_broker(100_000.0)
+        .add_data_feed(symbol)
         .add_strategy(SimpleStrategy{})
-        .init();
+        .build();
 
     green.run();
     green.plot();

@@ -1,11 +1,15 @@
 use egui::{Stroke, Color32};
 use egui_plot::{Plot, BoxPlot, BoxElem, BoxSpread, Legend, Line};
 
-use crate::green::green::Order;
+use crate::green::green::{
+    Order,
+    Bar
+};
 
 #[derive(Default)]
 pub struct App {
-    pub(crate) candle_data: Vec<Vec<f64>>,
+    // TODO: iterator vs vector
+    pub(crate) candle_data: dyn Iterator<Item=Bar>,
     pub cash_data: Vec<f64>,
     pub net_asset_data: Vec<f64>,
     pub order_data: Vec<Order>
