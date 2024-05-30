@@ -1,7 +1,5 @@
 use std::collections::VecDeque;
 use std::fs::File;
-use eframe::epaint::{Color32, Stroke};
-use egui_plot::{BoxElem, BoxPlot, BoxSpread};
 use time::OffsetDateTime;
 
 pub struct YahooFinanceData{

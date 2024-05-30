@@ -5,14 +5,11 @@ use crate::cmds::Command;
 pub struct PaperTradingCommand;
 
 use std::collections::VecDeque;
-use std::io::Write;
 
 use ibapi::contracts::{Contract, SecurityType};
 use ibapi::market_data::realtime::{BarSize, Bar, WhatToShow};
 use ibapi::orders::{order_builder, Action, OrderNotification};
 use ibapi::Client;
-use crate::green::green::Green;
-use crate::green::strategy::hold::SimpleStrategy;
 
 struct BreakoutChannel {
     ticks: VecDeque<(f64, f64)>,

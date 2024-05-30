@@ -1,5 +1,4 @@
 use std::io::Write;
-use colored::Colorize;
 
 mod cmds;
 mod green;

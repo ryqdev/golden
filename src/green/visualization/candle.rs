@@ -7,12 +7,13 @@ use crate::green::green::{
 };
 
 #[derive(Default)]
-pub struct App {
-    // TODO: iterator vs vector
-    pub(crate) candle_data: dyn Iterator<Item=Bar>,
-    pub cash_data: Vec<f64>,
-    pub net_asset_data: Vec<f64>,
-    pub order_data: Vec<Order>
+pub struct App<'a> {
+    // impl Iterator<Item = ...> can be used in scenarios where the size of object is known and fixed
+    // while Box<dyn Interator<Item = ...> is used otherwise
+    pub(crate) candle_data: &'a dyn Iterator<Item=Bar>,
+    pub cash_data: &'a Vec<f64>,
+    pub net_asset_data: &'a Vec<f64>,
+    pub order_data: &'a Vec<Order>
 }
 
 fn fetch_box_data(candle_data: Vec<Vec<f64>>) -> anyhow::Result<BoxPlot> {
@@ -37,7 +38,7 @@ fn fetch_box_data(candle_data: Vec<Vec<f64>>) -> anyhow::Result<BoxPlot> {
 }
 
 
-impl eframe::App for App {
+impl eframe::App for App<'_> {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::TopBottomPanel::top("Menu").show(ctx, |ui| {
             ctx.request_repaint_after(std::time::Duration::from_millis(200));

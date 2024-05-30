@@ -1,25 +1,15 @@
-use std::collections::hash_set::SymmetricDifference;
-use std::collections::VecDeque;
 use std::fs::File;
-use clickhouse::serde::time::datetime64::millis::option::deserialize;
-use egui::style::default_text_styles;
-use ibapi::{Client, Error};
+use ibapi::{Client};
 use ibapi::contracts::{Contract, SecurityType};
 use ibapi::market_data::realtime::{BarSize, WhatToShow};
 
-use ibapi::orders::{order_builder, OrderNotification};
 use time::OffsetDateTime;
 
-use crate::cmds::backtest::BackTestCommand;
 use crate::green::{
-    feeds::BaseData,
     strategy::{
         Strategy,
         hold::{SimpleStrategy}
     },
-    broker::Broker,
-    broker::backtest::BackTestBroker,
-    analyzer::Analyzer,
     visualization
 };
 
@@ -46,24 +36,32 @@ pub(crate) struct Order {
     pub(crate) size: f64,
 }
 
+struct BackTestClient {
+    pub(crate) cash: Vec<f64>,
+    pub position: Vec<f64>,
+    pub(crate) net_assets: Vec<f64>,
+    pub order: Vec<Order>
+}
 
-#[derive(Default)]
+struct BaseBroker{
+    name: String,
+    client: Option<Client>,
+    backtest_client: Option<BackTestClient>
+}
+
 pub struct Green {
-    // TODO: why to use dyn here
-    // TODO: why to use Box here
-    data: Box<dyn Iterator<Item = Bar>>,
+    data: dyn Iterator<Item= Bar>,
     // TODO: change to BaseType
     strategy: SimpleStrategy,
-    broker: BackTestBroker,
+    broker: BaseBroker,
     mode: GreenModeType,
 }
 
-
-#[derive(Default)]
 pub struct GreenBuilder {
-    data: Box<dyn Iterator<Item = Bar>>,
+    // use stack or heap, this is a question
+    data: dyn Iterator<Item=Bar>,
     strategy: SimpleStrategy,
-    broker: BackTestBroker,
+    broker: BaseBroker,
     mode: GreenModeType,
 }
 
@@ -79,35 +77,39 @@ impl Green {
         // .iter()     : borrows the ownership
         // .into_iter(): transfers the ownership
         for bar in self.data {
-            let order = self.strategy.next(&bar);
-            let cash = self.broker.cash.last().unwrap();
-            let position = self.broker.position.last().unwrap();
+            let order = &self.strategy.next(&bar);
+            let mut backtest_client = match &self.broker.backtest_client {
+                Some(client) => &client,
+                None => todo!()
+            };
             let close_price = &bar.close;
+
             match order.action {
                 Action::Buy => {
                     log::info!("Buy: {:?}", order);
-                    self.broker.cash.push(cash - order.size * close_price);
-                    self.broker.position.push(position + order.size);
-                    self.broker.net_assets.push(self.broker.cash.last().unwrap() + self.broker.position.last().unwrap() * close_price);
-                    self.broker.order.push(order)
                 }
                 Action::Sell => {
                     log::info!("Sell: {:?}", order);
-                    self.broker.cash.push(cash + order.size * close_price);
-                    self.broker.position.push(position - order.size);
-                    self.broker.net_assets.push(self.broker.cash.last().unwrap() + self.broker.position.last().unwrap() * close_price);
-                    self.broker.order.push(order)
                 }
-                _ => ()
+                _ => todo!()
             }
         }
     }
     pub fn plot(&self) {
         log::info!("Plotting {:?}...", self.strategy);
-        let candle_data = self.data.clone();
-        let cash_data = self.broker.cash.clone();
-        let net_asset_data = self.broker.net_assets.clone();
-        let order_data = self.broker.order.clone();
+        let candle_data = &self.data;
+        let cash_data = match &self.broker.backtest_client {
+            Some(client) => &client.cash,
+            None => todo!()
+        };
+        let net_asset_data = match &self.broker.backtest_client {
+            Some(client) => &client.net_assets,
+            None => todo!()
+        };
+        let order_data = match &self.broker.backtest_client {
+            Some(client) => &client.order,
+            None => todo!()
+        };
 
         let native_options = eframe::NativeOptions::default();
         eframe::run_native(
@@ -126,18 +128,17 @@ impl Green {
 
 impl GreenBuilder {
     pub fn set_data_feed(&mut self, symbol: &str) -> &mut GreenBuilder{
-        // TODO: refactor code
-        let contract = Contract {
-            symbol: "USD".to_owned(),
-            security_type: SecurityType::ForexPair,
-            currency: "JPY".to_owned(),
-            exchange: "IDEALPRO".to_owned(),
-            ..Default::default()
-        };
-
         self.data = match self.mode{
             GreenModeType::Backtest => fetch_csv_data(symbol),
-            GreenModeType::Paper => self.broker.realtime_bars(&contract, BarSize::Sec5, WhatToShow::MidPoint, false).unwrap(),
+
+            GreenModeType::Paper => self.broker.realtime_bars(&Contract {
+                symbol: "USD".to_owned(),
+                security_type: SecurityType::ForexPair,
+                currency: "JPY".to_owned(),
+                exchange: "IDEALPRO".to_owned(),
+                ..Default::default()
+            }, BarSize::Sec5, WhatToShow::MidPoint, false).unwrap(),
+
             GreenModeType::Live => todo!()
         };
         self
@@ -148,13 +149,22 @@ impl GreenBuilder {
     }
     pub fn set_broker(&mut self, cash: f64) -> &mut GreenBuilder {
         self.broker = match self.mode {
-            GreenModeType::Backtest => BackTestBroker{
-                cash: Vec::from([cash]),
-                position: Vec::from([0.0]),
-                net_assets:  Vec::from([cash]),
-                order: vec![],
+            GreenModeType::Backtest => BaseBroker{
+                name: "backtest".to_owned(),
+                client: None,
+                backtest_client: Option::from(BackTestClient {
+                    cash: Vec::from([cash]),
+                    position: Vec::from([0.0]),
+                    net_assets: Vec::from([cash]),
+                    order: vec![],
+                })
+
             },
-            GreenModeType::Paper => Client::connect("127.0.0.1:7497", 100).unwrap(),
+            GreenModeType::Paper => BaseBroker {
+                name: "paper".to_owned(),
+                client: Some(Client::connect("127.0.0.1:7497", 100).unwrap()),
+                backtest_client: None
+            },
             GreenModeType::Live => todo!()
         };
         self
@@ -168,7 +178,7 @@ impl GreenBuilder {
     // }
     pub fn build(&self) -> Box<Green> {
         Box::new(Green{
-            data: self.data,
+            data: &self.data,
             strategy: self.strategy.clone(),
             broker: self.broker.clone(),
             mode: self.mode,
@@ -197,7 +207,6 @@ fn fetch_csv_data(symbol: &str) -> impl Iterator<Item = Bar> {
         .from_reader(csv_file)
         .deserialize();
 
-    // TODO: correct the iterator
     reader.map(|record:(String, Vec<f64>)| Bar{
         date: OffsetDateTime::now_utc(),
         open: record.1[0],

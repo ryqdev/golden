@@ -1,6 +1,5 @@
 use url::Url;
-use tungstenite::{connect, Message};
-use serde_json;
+use tungstenite::{connect};
 
 const BASE_URL: &str = "wss://stream.data.alpaca.markets/v2/test";
 
