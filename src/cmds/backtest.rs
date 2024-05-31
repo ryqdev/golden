@@ -2,11 +2,7 @@ use super::Command;
 use anyhow::{Result};
 use clap::{Arg, ArgMatches, Command as ClapCommand};
 use async_trait::async_trait;
-use crate::green::{
-    cli::Green,
-};
-use crate::green::cli::GreenModeType;
-use crate::green::strategy::hold::SimpleStrategy;
+use crate::{BaseStrategy, Golden, GoldenModeType};
 
 pub struct BackTestCommand;
 
@@ -35,14 +31,14 @@ impl Command for BackTestCommand {
 }
 
 async fn backtest(symbol: &str) -> Result<()> {
-    let mut green = Green::new()
-        .set_mode(GreenModeType::Backtest)
+    // TODO: Lifetime!!!!
+    let green = Golden::new()
+        .set_mode(GoldenModeType::Backtest)
         .set_broker(100_000.0)
         .set_data_feed(symbol)
-        .set_strategy(SimpleStrategy{})
-        .build();
+        .set_strategy(BaseStrategy{ name: "test".to_string() });
 
-    green.run();
-    green.plot();
+    &green.run();
+    &green.plot();
     Ok(())
 }

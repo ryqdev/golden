@@ -1,10 +1,8 @@
 use egui::{Stroke, Color32};
 use egui_plot::{Plot, BoxPlot, BoxElem, BoxSpread, Legend, Line};
+use crate::{Bar, Order};
 
-use crate::green::green::{
-    Order,
-    Bar
-};
+
 
 #[derive(Default)]
 pub struct App<'a> {
@@ -16,7 +14,7 @@ pub struct App<'a> {
     pub order_data: &'a Vec<Order>
 }
 
-fn fetch_box_data(candle_data: Vec<Vec<f64>>) -> anyhow::Result<BoxPlot> {
+fn fetch_box_data(candle_data: &Vec<Bar>) -> anyhow::Result<BoxPlot> {
     let red = Color32::from_rgb(255,0,0);
     let green = Color32::from_rgb(0,255,0);
 
@@ -24,13 +22,9 @@ fn fetch_box_data(candle_data: Vec<Vec<f64>>) -> anyhow::Result<BoxPlot> {
     let mut idx = 0.0;
 
     for record in candle_data {
-        let low = record[2];
-        let open = record[0];
-        let close = record[3];
-        let high = record[1];
-        let color = if close >= open {green} else {red};
+        let color = if record.close >= record.open {green} else {red};
         historical_data.push(
-            BoxElem::new(idx, BoxSpread::new(low, open, open,close , high)).whisker_width(0.0).fill(color).stroke(Stroke::new(2.0, color)),
+            BoxElem::new(idx, BoxSpread::new(record.low, record.open, record.open, record.close , record.high)).whisker_width(0.0).fill(color).stroke(Stroke::new(2.0, color)),
         );
         idx += 1.0
     }
@@ -96,7 +90,7 @@ impl eframe::App for App<'_> {
                     .height(1000.0)
                     .width(2000.0)
                     .show(ui, |plot_ui| {
-                        let data = fetch_box_data(self.candle_data.clone()).expect("fetch csv data error");
+                        let data = fetch_box_data(self.candle_data.collect()).expect("fetch csv data error");
                         plot_ui.box_plot(data);
                     });
             });
