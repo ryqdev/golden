@@ -77,17 +77,24 @@ pub struct Golden<'a> {
 
 impl Golden<'_> {
     // TODO: 'static or 'a
-    pub fn new() -> Golden<'static> {
+    pub fn new(golden_type: GoldenModeType, cash: f64, symbol: &str, strategy: BaseStrategy) -> Golden<'static> {
         Golden{
-            ..Default::default()
+            data: &(),
+            strategy,
+            broker: BaseBroker{
+                name: "".to_string(),
+                client: None,
+                backtest_client: None,
+            },
+            mode: golden_type,
         }
     }
-    pub fn run(&mut self) {
+    pub fn run(&self) {
         log::info!("Running {:?}...", self.strategy);
 
         // .iter()     : borrows the ownership
         // .into_iter(): transfers the ownership
-        for bar in &self.data {
+        for bar in self.data {
             let order = &self.strategy.next(&bar);
             let mut backtest_client = match &self.broker.backtest_client {
                 Some(client) => &client,

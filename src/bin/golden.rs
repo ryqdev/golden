@@ -24,6 +24,7 @@ fn init_log() {
         .init();
 }
 
+// TODO: how about using tokio::runtime::Builder?
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
 

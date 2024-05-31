@@ -4,7 +4,6 @@ use crate::{Bar, Order};
 
 
 
-#[derive(Default)]
 pub struct App<'a> {
     // impl Iterator<Item = ...> can be used in scenarios where the size of object is known and fixed
     // while Box<dyn Interator<Item = ...> is used otherwise
@@ -14,7 +13,7 @@ pub struct App<'a> {
     pub order_data: &'a Vec<Order>
 }
 
-fn fetch_box_data(candle_data: &Vec<Bar>) -> anyhow::Result<BoxPlot> {
+fn fetch_box_data(candle_data: impl Iterator<Item=Bar>) -> anyhow::Result<BoxPlot> {
     let red = Color32::from_rgb(255,0,0);
     let green = Color32::from_rgb(0,255,0);
 
@@ -90,7 +89,7 @@ impl eframe::App for App<'_> {
                     .height(1000.0)
                     .width(2000.0)
                     .show(ui, |plot_ui| {
-                        let data = fetch_box_data(self.candle_data.collect()).expect("fetch csv data error");
+                        let data = fetch_box_data(self.candle_data).expect("fetch csv data error");
                         plot_ui.box_plot(data);
                     });
             });

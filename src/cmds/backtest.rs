@@ -32,13 +32,13 @@ impl Command for BackTestCommand {
 
 async fn backtest(symbol: &str) -> Result<()> {
     // TODO: Lifetime!!!!
-    let green = Golden::new()
-        .set_mode(GoldenModeType::Backtest)
-        .set_broker(100_000.0)
-        .set_data_feed(symbol)
-        .set_strategy(BaseStrategy{ name: "test".to_string() });
+    let green = Golden::new(GoldenModeType::Backtest, 100_000.0, symbol, BaseStrategy{ name: "test".to_string() });
+        // .set_mode(GoldenModeType::Backtest)
+        // .set_broker(100_000.0)
+        // .set_data_feed(symbol)
+        // .set_strategy(BaseStrategy{ name: "test".to_string() });
 
-    &green.run();
-    &green.plot();
+    green.run();
+    green.plot();
     Ok(())
 }
