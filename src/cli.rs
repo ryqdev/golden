@@ -52,10 +52,14 @@ struct BaseBroker{
     backtest_client: Option<BackTestClient>
 }
 
+struct BaseStrategy{
+    name: String,
+}
+
 pub struct Green {
     data: dyn Iterator<Item= Bar>,
     // TODO: change to BaseType
-    strategy: SimpleStrategy,
+    strategy: BaseStrategy,
     broker: BaseBroker,
     mode: GreenModeType,
 }
@@ -63,7 +67,7 @@ pub struct Green {
 pub struct GreenBuilder {
     // use stack or heap, this is a question
     data: dyn Iterator<Item=Bar>,
-    strategy: SimpleStrategy,
+    strategy: BaseStrategy,
     broker: BaseBroker,
     mode: GreenModeType,
 }
@@ -212,7 +216,7 @@ fn fetch_csv_data(symbol: &str) -> Result<String, Error> {
     Ok(buffer)
 }
 
-fn get_bar_from_csv<T>(symbol: &str) -> impl Iterator<Item = T> {
+fn get_bar_from_csv(symbol: &str) -> impl Iterator<Item = Bar> {
     let buffer = fetch_csv_data(symbol).unwrap();
     let mut lines = buffer.lines();
     let headers = lines.next().unwrap();

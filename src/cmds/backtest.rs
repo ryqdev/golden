@@ -3,9 +3,9 @@ use anyhow::{Result};
 use clap::{Arg, ArgMatches, Command as ClapCommand};
 use async_trait::async_trait;
 use crate::green::{
-    green::Green,
+    cli::Green,
 };
-use crate::green::green::GreenModeType;
+use crate::green::cli::GreenModeType;
 use crate::green::strategy::hold::SimpleStrategy;
 
 pub struct BackTestCommand;

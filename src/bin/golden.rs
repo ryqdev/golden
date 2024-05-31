@@ -1,9 +1,5 @@
 use std::io::Write;
 
-mod cmds;
-mod green;
-mod err;
-
 use crate::{cmds::{Command,
                    backtest::BackTestCommand,
                    paper::PaperTradingCommand,
