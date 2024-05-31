@@ -11,8 +11,6 @@ pub mod strategy;
 use std::fs::File;
 use std::io::Read;
 use ibapi::{Client};
-use ibapi::contracts::{Contract, SecurityType};
-use ibapi::market_data::realtime::{BarSize, WhatToShow};
 
 use time::OffsetDateTime;
 use err::Error;
@@ -47,46 +45,45 @@ struct BackTestClient {
     pub order: Vec<Order>
 }
 
+#[derive(Default)]
 struct BaseBroker{
     name: String,
     client: Option<Client>,
     backtest_client: Option<BackTestClient>
 }
 
-#[derive(Debug)]
+#[derive(Debug,Default)]
 pub struct BaseStrategy{
     name: String,
 }
 
 impl BaseStrategy {
     fn next(bar: &Bar) {
-
     }
 }
 
-pub struct Golden<'a> {
-    // use stack or heap, this is a question
-    data: &'a dyn Iterator<Item= Bar>,
-    // TODO: change to BaseType
+pub struct Golden {
+    data: Box<dyn Iterator<Item = Bar>>,
     strategy: BaseStrategy,
     broker: BaseBroker,
     mode: GoldenModeType,
 }
 
+// TODO: any better implementations?
+impl Default for Golden {
+    fn default() -> Self {
+        Golden {
+            data: Box::new(std::iter::empty()),
+            ..Default::default()
+        }
+    }
+}
 
 
-impl Golden<'_> {
-    // TODO: 'static or 'a
-    pub fn new(golden_type: GoldenModeType, cash: f64, symbol: &str, strategy: BaseStrategy) -> Golden<'static> {
+impl Golden {
+    pub fn new() -> Golden {
         Golden{
-            data: &(),
-            strategy,
-            broker: BaseBroker{
-                name: "".to_string(),
-                client: None,
-                backtest_client: None,
-            },
-            mode: golden_type,
+            ..Default::default()
         }
     }
     pub fn run(&self) {
@@ -94,64 +91,66 @@ impl Golden<'_> {
 
         // .iter()     : borrows the ownership
         // .into_iter(): transfers the ownership
-        for bar in self.data {
-            let order = &self.strategy.next(&bar);
-            let mut backtest_client = match &self.broker.backtest_client {
-                Some(client) => &client,
-                None => todo!()
-            };
-            let close_price = &bar.close;
+        // for bar in self.data {
+            // let order = &self.strategy.next(&bar);
+            // let mut backtest_client = match &self.broker.backtest_client {
+            //     Some(client) => &client,
+            //     None => todo!()
+            // };
+            // let close_price = &bar.close;
 
-            match order.action {
-                Action::Buy => {
-                    log::info!("Buy: {:?}", order);
-                }
-                Action::Sell => {
-                    log::info!("Sell: {:?}", order);
-                }
-                _ => todo!()
-            }
-        }
+            // match order.action {
+            //     Action::Buy => {
+            //         log::info!("Buy: {:?}", order);
+            //     }
+            //     Action::Sell => {
+            //         log::info!("Sell: {:?}", order);
+            //     }
+            //     _ => todo!()
+            // }
+        // }
     }
     pub fn plot(&self) {
+        // lifetime!!!
         log::info!("Plotting {:?}...", self.strategy);
-        let candle_data = self.data;
-        let cash_data = match &self.broker.backtest_client {
-            Some(client) => &client.cash,
-            None => todo!()
-        };
-        let net_asset_data = match &self.broker.backtest_client {
-            Some(client) => &client.net_assets,
-            None => todo!()
-        };
-        let order_data = match &self.broker.backtest_client {
-            Some(client) => &client.order,
-            None => todo!()
-        };
-
-        let native_options = eframe::NativeOptions::default();
-        eframe::run_native(
-            &format!("backtest {:?}", self.strategy),
-            native_options,
-            Box::new(|cc| Box::new(visualization::candle::App{
-                candle_data,
-                cash_data,
-                net_asset_data,
-                order_data
-            })),
-        ).expect("Plotting error");
+        // let candle_data = &self.data;
+        // let cash_data = match &self.broker.backtest_client {
+        //     Some(client) => &client.cash,
+        //     None => todo!()
+        // };
+        // let net_asset_data = match &self.broker.backtest_client {
+        //     Some(client) => &client.net_assets,
+        //     None => todo!()
+        // };
+        // let order_data = match &self.broker.backtest_client {
+        //     Some(client) => &client.order,
+        //     None => todo!()
+        // };
+        //
+        // let native_options = eframe::NativeOptions::default();
+        // eframe::run_native(
+        //     &format!("backtest {:?}", self.strategy),
+        //     native_options,
+        //     Box::new(|cc| Box::new(visualization::candle::App{
+        //         candle_data,
+        //         cash_data,
+        //         net_asset_data,
+        //         order_data
+        //     })),
+        // ).expect("Plotting error");
     }
     pub fn set_data_feed(&mut self, symbol: &str) -> &mut Golden{
         self.data = match self.mode{
             GoldenModeType::Backtest => todo!(),
+            GoldenModeType::Paper => todo!(),
 
-            GoldenModeType::Paper => self.broker.realtime_bars(&Contract {
-                symbol: "USD".to_owned(),
-                security_type: SecurityType::ForexPair,
-                currency: "JPY".to_owned(),
-                exchange: "IDEALPRO".to_owned(),
-                ..Default::default()
-            }, BarSize::Sec5, WhatToShow::MidPoint, false).unwrap(),
+            // GoldenModeType::Paper => self.broker.realtime_bars(&Contract {
+            //     symbol: "USD".to_owned(),
+            //     security_type: SecurityType::ForexPair,
+            //     currency: "JPY".to_owned(),
+            //     exchange: "IDEALPRO".to_owned(),
+            //     ..Default::default()
+            // }, BarSize::Sec5, WhatToShow::MidPoint, false).unwrap(),
 
             GoldenModeType::Live => todo!()
         };
@@ -221,7 +220,7 @@ pub fn get_bar_from_csv(symbol: &str) {
     let buffer = fetch_csv_data(symbol).unwrap();
     let mut lines = buffer.lines();
     let headers = lines.next().unwrap();
-    let columns: Vec<f64> = headers.split(',').collect();
+    let columns: Vec<&str> = headers.split(',').collect();
     println!("{:?}", columns)
 
     // for line in lines {

@@ -7,26 +7,26 @@ use crate::{Bar, Order};
 pub struct App<'a> {
     // impl Iterator<Item = ...> can be used in scenarios where the size of object is known and fixed
     // while Box<dyn Interator<Item = ...> is used otherwise
-    pub(crate) candle_data: &'a dyn Iterator<Item=Bar>,
+    pub(crate) candle_data: &'a Box<dyn Iterator<Item=Bar>>,
     pub cash_data: &'a Vec<f64>,
     pub net_asset_data: &'a Vec<f64>,
     pub order_data: &'a Vec<Order>
 }
 
-fn fetch_box_data(candle_data: impl Iterator<Item=Bar>) -> anyhow::Result<BoxPlot> {
+fn fetch_box_data(candle_data: &Box<dyn Iterator<Item=Bar>>) -> anyhow::Result<BoxPlot> {
     let red = Color32::from_rgb(255,0,0);
     let green = Color32::from_rgb(0,255,0);
 
     let mut historical_data = vec![];
     let mut idx = 0.0;
 
-    for record in candle_data {
-        let color = if record.close >= record.open {green} else {red};
-        historical_data.push(
-            BoxElem::new(idx, BoxSpread::new(record.low, record.open, record.open, record.close , record.high)).whisker_width(0.0).fill(color).stroke(Stroke::new(2.0, color)),
-        );
-        idx += 1.0
-    }
+    // for record in candle_data {
+    //     let color = if record.close >= record.open {green} else {red};
+    //     historical_data.push(
+    //         BoxElem::new(idx, BoxSpread::new(record.low, record.open, record.open, record.close , record.high)).whisker_width(0.0).fill(color).stroke(Stroke::new(2.0, color)),
+    //     );
+    //     idx += 1.0
+    // }
     Ok(BoxPlot::new(historical_data).name("candle"))
 }
 

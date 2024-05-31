@@ -24,21 +24,18 @@ impl Command for BackTestCommand {
     async fn handler(m: &ArgMatches) -> Result<()> {
         let symbol = m.get_one::<String>("symbol").unwrap();
         log::info!("Backtest {symbol}");
-        backtest(symbol).await?;
+
+        // temporary value dropped while borrowed
+        let mut golden = Golden::new();
+
+        golden.set_mode(GoldenModeType::Backtest);
+        golden.set_broker(100_000.0);
+        golden.set_data_feed(symbol);
+        golden.set_strategy(BaseStrategy{ name: "test".to_string() });
+
+        golden.run();
+        golden.plot();
         Ok(())
     }
 
-}
-
-async fn backtest(symbol: &str) -> Result<()> {
-    // TODO: Lifetime!!!!
-    let green = Golden::new(GoldenModeType::Backtest, 100_000.0, symbol, BaseStrategy{ name: "test".to_string() });
-        // .set_mode(GoldenModeType::Backtest)
-        // .set_broker(100_000.0)
-        // .set_data_feed(symbol)
-        // .set_strategy(BaseStrategy{ name: "test".to_string() });
-
-    green.run();
-    green.plot();
-    Ok(())
 }

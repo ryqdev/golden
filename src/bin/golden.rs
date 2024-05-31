@@ -1,3 +1,9 @@
+//! There are only two hard things in Computer Science:
+//! 1. Cache invalidation
+//! 2. Naming things
+//!
+//! So I will use closure to avoid naming variables or functions
+
 use std::io::Write;
 
 // TODO: golden vs craft
