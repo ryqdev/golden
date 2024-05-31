@@ -1,4 +1,7 @@
 use std::fs::File;
+use std::io::Read;
+use std::ptr::read;
+use anyhow::format_err;
 use ibapi::{Client};
 use ibapi::contracts::{Contract, SecurityType};
 use ibapi::market_data::realtime::{BarSize, WhatToShow};
@@ -199,34 +202,25 @@ pub struct Bar {
 }
 
 
-fn fetch_csv_data(symbol: &str) -> impl Iterator<Item = Bar> {
-    let csv_file = File::open(format!("data/{symbol}.csv")).unwrap();
-
-    let mut reader = csv::ReaderBuilder::new()
-        .has_headers(true)
-        .from_reader(csv_file)
-        .deserialize();
-
-    // TODO: Why move here
-    reader.map(move |record:(String, Vec<f64>)| Bar{
-        date: OffsetDateTime::now_utc(),
-        open: record.1[0],
-        high: record.1[1],
-        low: record.1[2],
-        close: record.1[3],
-        volume: 0.0,
-        wap: 0.0,
-        count: 0,
-    })
-
+fn fetch_csv_data(symbol: &str) -> Result<String, Error> {
+    let mut buffer = String::new();
+    let mut csv_file = File::open(format!("data/{symbol}.csv")).unwrap();
+    csv_file.read_to_string(&mut buffer);
+    if buffer.is_empty() {
+        return Err("csv file missing")
+    }
+    Ok(buffer)
 }
 
-fn bar_from_csv<T>(
-    csv_reader: impl Iterator<Item = XXXX>
-) -> impl Iterator<Item = Bar>
-where T: XXXX
-{
-    // TODO:
+fn get_bar_from_csv<T>(symbol: &str) -> impl Iterator<Item = T> {
+    let buffer = fetch_csv_data(symbol).unwrap();
+    let mut lines = buffer.lines();
+    let headers = lines.next().unwrap();
+    let columns = headers.split(',').collect();
+
+    for line in lines {
+        let mut record = line.split(',').collect();
+    }
     csv_reader.map(move |r| Bar{
         date: OffsetDateTime::now_utc(),
         open: r.1[0],
@@ -241,4 +235,3 @@ where T: XXXX
 
 // fn connect_and_fetch_market_data() -> impl Iterator<Item = Bar>{
 //
-// }
