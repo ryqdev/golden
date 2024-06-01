@@ -123,6 +123,7 @@ impl Golden for BackTestGolden {
         let candle_data = self.data.clone();
         let cash_data = self.broker.cash.clone();
         let order_data = self.broker.order.clone();
+        let net_assets_data = self.broker.net_assets.clone();
 
         let native_options = eframe::NativeOptions::default();
         eframe::run_native(
@@ -131,6 +132,7 @@ impl Golden for BackTestGolden {
             Box::new(|cc| Box::new(visualization::vis::App{
                 candle_data,
                 cash_data,
+                net_assets_data,
                 order_data
             })),
         ).expect("Plotting error");

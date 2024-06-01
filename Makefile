@@ -2,7 +2,7 @@ backtest:
 	cargo run backtest --symbol ${symbol}
 
 paper:
-	cargo run paper-trading
+	cargo run paper
 
 live:
-	cargo run live-trading
+	cargo run live
