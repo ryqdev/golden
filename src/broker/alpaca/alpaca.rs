@@ -1,9 +1,8 @@
-use log::log;
 use url::Url;
 use tungstenite::{connect, Message};
 use serde_json;
 
-const TEST_BASE_URL: &str = "wss://stream.data.alpaca.markets/v2/test";
+// const TEST_BASE_URL: &str = "wss://stream.data.alpaca.markets/v2/test";
 const BASE_URL: &str = "wss://stream.data.alpaca.markets/v1beta2/crypto";
 
 pub async fn alpaca_trading() {

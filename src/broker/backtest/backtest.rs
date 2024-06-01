@@ -8,9 +8,9 @@ pub(crate) struct BacktestBroker {
 }
 
 #[derive(Default, Clone, Debug)]
-pub(crate) struct Order {
+pub struct Order {
     pub action: Action,
-    pub(crate) size: f64,
+    pub size: f64,
 }
 
 #[derive(Debug, Default, Copy, Clone)]

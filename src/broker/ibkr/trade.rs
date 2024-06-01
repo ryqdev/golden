@@ -1,5 +1,3 @@
-pub struct PaperTradingCommand;
-
 use std::collections::VecDeque;
 
 use ibapi::contracts::{Contract, SecurityType};
