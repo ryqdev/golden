@@ -106,6 +106,7 @@ impl Golden for BackTestGolden {
     }
 
     fn set_analyzer(&mut self) -> &mut dyn Golden {
+        // very simple analyzer
         let p_h = self.broker.net_assets.last().unwrap() - self.broker.net_assets.first().unwrap();
         let color = if p_h > 0.0 {GoldenColor::GREEN} else {GoldenColor::RED};
         let reset_color = GoldenColor::RESET;

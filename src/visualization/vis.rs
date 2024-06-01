@@ -2,70 +2,30 @@ use egui::{Stroke, Color32};
 use egui_plot::{Plot, BoxPlot, BoxElem, BoxSpread, Legend, Line};
 use crate::feeds::Bar;
 use crate::broker::backtest::backtest::Order;
-
+use anyhow::Result;
 
 
 pub struct App {
-    // impl Iterator<Item = ...> can be used in scenarios where the size of object is known and fixed
-    // while Box<dyn Interator<Item = ...> is used otherwise
-
-    pub(crate) candle_data:  Vec<Bar>,
+    pub candle_data:  Vec<Bar>,
     pub cash_data: Vec<f64>,
     pub order_data:  Vec<Order>
 }
 
-fn fetch_box_data(candle_data: &Vec<Bar>) -> anyhow::Result<BoxPlot> {
+fn fetch_box_data(candle_data: &Vec<Bar>) -> Result<BoxPlot> {
     let red = Color32::from_rgb(255,0,0);
     let green = Color32::from_rgb(0,255,0);
 
-    let mut historical_data = vec![];
-    let mut idx = 0.0;
-
-    for record in candle_data {
-        let color = if record.close >= record.open {green} else {red};
-        historical_data.push(
-            BoxElem::new(idx, BoxSpread::new(record.low, record.open, record.open, record.close , record.high)).whisker_width(0.0).fill(color).stroke(Stroke::new(2.0, color)),
-        );
-        idx += 1.0
+    let mut historial_data =  vec![];
+    for (idx, bar) in candle_data.iter().enumerate() {
+        let color = if bar.close >= bar.open {green} else {red};
+        historial_data.push(BoxElem::new(idx as f64, BoxSpread::new(bar.low, bar.open, bar.open, bar.close, bar.high)).whisker_width(0.0).fill(color).stroke(Stroke::new(2.0, color)));
     }
-    Ok(BoxPlot::new(historical_data).name("candle"))
+    Ok(BoxPlot::new(historial_data).name("candle"))
 }
 
 
 impl eframe::App for App {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
-        egui::TopBottomPanel::top("Menu").show(ctx, |ui| {
-            ctx.request_repaint_after(std::time::Duration::from_millis(200));
-            egui::menu::bar(ui, |ui| {
-                ui.menu_button("Trading", |ui| {
-                    if ui.button("Equities").clicked() {
-                        println!("> Equities.");
-                    }
-                    if ui.button("Forex").clicked() {
-                        println!("> Forex.");
-                    }
-                });
-                ui.menu_button("Portfolios", |ui| {
-                    if ui.button("Archimedes I").clicked() {
-                        println!("> Archimedes I.");
-                    }
-                });
-                ui.menu_button("Risk Management", |ui| {
-                    ui.menu_button("Value-at-Risk", |ui| {
-                        if ui.button("Parametric").clicked() {
-                            println!("> Parametric.");
-                        }
-                        if ui.button("Historical").clicked() {
-                            println!("> Historical.");
-                        }
-                        if ui.button("Monte Carlo Simulation").clicked() {
-                            println!("> Monte Carlo Simulation.");
-                        }
-                    });
-                });
-            });
-        });
-
         egui::SidePanel::right("portfolio")
             .default_width(1920f32)
             .show(ctx, |ui| {
@@ -104,8 +64,7 @@ impl eframe::App for App {
                     .height(1000.0)
                     .width(2000.0)
                     .show(ui, |plot_ui| {
-                        let cash_line: egui_plot::PlotPoints = self.cash_data.clone()
-                            .into_iter()
+                        let cash_line: egui_plot::PlotPoints = self.cash_data.iter()
                             .enumerate()
                             .map(|(i, value)| [i as f64, (value * 1.0) as f64])
                             .collect();
