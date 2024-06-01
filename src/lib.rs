@@ -59,8 +59,20 @@ pub struct BaseStrategy{
 }
 
 impl BaseStrategy {
-    pub fn next(&self, bar: &Bar) {
+    fn next(&mut self, data: &Bar) -> Order {
+        if data.close > data.open {
+            Order{
+                action: Action::Buy,
+                size: 1.0
+            }
+        } else {
+            Order{
+                action: Action::Sell,
+                size: 1.0
+            }
+        }
     }
+
 }
 
 #[derive(Default)]
@@ -78,16 +90,16 @@ impl Golden {
         log::info!("getting golden");
         Default::default()
     }
-    pub fn run(&self) -> &Golden {
+    pub fn run(&mut self) -> &Golden {
         log::info!("Running {:?}...", self.strategy);
 
         for bar in self.data.iter() {
             let order = &self.strategy.next(&bar);
-            let mut backtest_client = match &self.broker.backtest_client {
-                Some(client) => &client,
-                None => todo!()
-            };
-            let close_price = &bar.close;
+            // let mut backtest_client = match &self.broker.backtest_client {
+            //     Some(client) => &client,
+            //     None => todo!()
+            // };
+            // let close_price = &bar.close;
 
             match order.action {
                 Action::Buy => {
