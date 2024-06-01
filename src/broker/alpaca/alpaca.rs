@@ -1,7 +1,6 @@
 /// https://docs.alpaca.markets/docs/websocket-streaming
 use url::Url;
 use tungstenite::{connect, Message};
-use serde_json;
 use dotenv::dotenv;
 use std::env;
 
@@ -25,16 +24,21 @@ pub async fn alpaca_trading() {
         "secret": "{secret}"
     }}"#);
 
-    // expected response: {"stream":"authorization","data":{"action":"authenticate","status":"authorized"}}
-
     let subscribe = r#"{
-    "action":"listening",
-    "data":{
-        "streams": ["trade_updates"]
-    }
+        "action":"subscribe",
+        "params":"BTCUSD",
     }"#;
 
+    // let listen = r#"{
+    //     "action":"listen",
+    //     "data":{
+    //         "streams": ["BTCUSD"]
+    //     }
+    // }"#;
+
     socket.send(Message::Text(authorization.into())).unwrap();
+    // expected response: {"stream":"authorization","data":{"action":"authenticate","status":"authorized"}}
+
     socket.send(Message::Text(subscribe.into())).unwrap();
 
     loop {

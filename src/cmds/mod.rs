@@ -4,7 +4,7 @@ use async_trait::async_trait;
 use crate::broker::backtest::backtest::BacktestBroker;
 use crate::feeds::{
     Bar,
-    csv::csv::get_bar_from_csv
+    csv::fetch::get_bar_from_csv
 };
 use crate::visualization;
 use crate::strategy::strategy::BaseStrategy;
@@ -151,3 +151,4 @@ impl Golden for BackTestGolden {
 pub mod backtest;
 pub mod paper;
 pub mod live;
+pub mod csv;
