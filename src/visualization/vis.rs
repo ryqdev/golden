@@ -16,12 +16,13 @@ fn fetch_box_data(candle_data: &Vec<Bar>) -> Result<BoxPlot> {
     let red = Color32::from_rgb(255,0,0);
     let green = Color32::from_rgb(0,255,0);
 
-    let mut historial_data =  vec![];
-    for (idx, bar) in candle_data.iter().enumerate() {
-        let color = if bar.close >= bar.open {green} else {red};
-        historial_data.push(BoxElem::new(idx as f64, BoxSpread::new(bar.low, bar.open, bar.open, bar.close, bar.high)).whisker_width(0.0).fill(color).stroke(Stroke::new(2.0, color)));
-    }
-    Ok(BoxPlot::new(historial_data).name("candle"))
+    Ok(BoxPlot::new(candle_data.iter()
+        .enumerate()
+        .map(|(idx, bar)| {
+            let color = if bar.close >= bar.open {green} else {red};
+            BoxElem::new(idx as f64, BoxSpread::new(bar.low, bar.open, bar.open, bar.close, bar.high)).whisker_width(0.0).fill(color).stroke(Stroke::new(2.0, color))
+        }).collect()
+    ).name("candle"))
 }
 
 
