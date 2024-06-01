@@ -2,8 +2,14 @@
 name = "golden"
 version = "0.1.0"
 edition = "2021"
+description = "All in one trading engine"
+license = "GPL-3.0"
+repository = "https://github.com/ryqdev/golden"
+authors = ["ryqdev"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[[bin]]
+name = "golden"
+path = "src/bin/golden.rs"
 
 [dependencies]
 anyhow = "1.0.82"
