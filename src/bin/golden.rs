@@ -13,7 +13,7 @@ use golden::{cmds::{Command,
                    live::LiveTradingCommand}
 };
 
-fn init_log() {
+pub fn init_log() {
     env_logger::Builder::new()
         .format(|buf, record| {
             writeln!(

@@ -205,6 +205,26 @@ pub struct Bar {
     pub count: i32,
 }
 
+#[derive(Debug)]
+struct Row {
+    label: String,
+    values: Vec<i32>,
+}
+
+// https://docs.rs/csv/latest/csv/struct.Reader.html
+pub fn example() -> Result<(), Box<dyn std::error::Error>> {
+    let mut rdr = csv::ReaderBuilder::new()
+        .has_headers(true)
+        .from_path("data/SPY.csv")?;
+
+    if let Some(result) = rdr.next() {
+        let record: Row = result?;
+        log::info!("{:?}", record);
+        Ok(())
+    } else {
+        Err(From::from("expected at least one record but got none"))
+    }
+}
 
 fn fetch_csv_data(symbol: &str) -> Result<String, Error> {
     let mut buffer = String::new();
@@ -216,16 +236,26 @@ fn fetch_csv_data(symbol: &str) -> Result<String, Error> {
     Ok(buffer)
 }
 
-pub fn get_bar_from_csv(symbol: &str) {
+pub fn get_bar_from_csv(symbol: &str) -> Vec<Bar>{
     let buffer = fetch_csv_data(symbol).unwrap();
     let mut lines = buffer.lines();
-    let headers = lines.next().unwrap();
-    let columns: Vec<&str> = headers.split(',').collect();
-    println!("{:?}", columns)
+    let _ = lines.next().unwrap(); // skip header
 
-    // for line in lines {
-    //     let mut record = line.split(',').collect();
-    // }
+    let mut bars: Vec<Bar> = Vec::new();
+    for line in lines {
+        let r: Vec<_> = line.split(',').collect();
+        bars.push(Bar{
+                date: OffsetDateTime::now_utc(),
+                open: r[2].parse().unwrap(),
+                high: r[2].parse().unwrap(),
+                low: r[3].parse().unwrap(),
+                close: r[4].parse().unwrap(),
+                volume: 0.0,
+                wap: 0.0,
+                count: 0,
+        })
+    }
+    bars
     // csv_reader.map(move |r| Bar{
     //     date: OffsetDateTime::now_utc(),
     //     open: r.1[0],
