@@ -1,6 +1,6 @@
 use std::fs::File;
 use time::OffsetDateTime;
-use crate::{Bar};
+use crate::feeds::Bar;
 
 
 #[derive(Debug, serde::Deserialize, PartialEq)]

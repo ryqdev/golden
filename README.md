@@ -2,6 +2,8 @@
 All in one trading engine
 
 ## Features
+- [ ] Configuation files
+
 ### Backtest
 - [ ] Learn and develop strategies
 - [x] Single data feed

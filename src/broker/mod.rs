@@ -4,3 +4,4 @@ pub trait Broker{
 
 mod alpaca;
 pub(crate) mod ibkr;
+pub mod backtest;

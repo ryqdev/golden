@@ -1,10 +1,11 @@
-use super::Command;
+use super::{Command, BackTestGolden, Golden};
 use anyhow::{Result};
 use clap::{Arg, ArgMatches, Command as ClapCommand};
 use async_trait::async_trait;
-use crate::{BackTestGolden, BaseStrategy, Golden};
-
 pub struct BackTestCommand;
+use crate::strategy::strategy::BaseStrategy;
+use crate::feeds::Bar;
+use crate::broker::backtest::backtest::BacktestBroker;
 
 #[async_trait]
 impl Command for BackTestCommand {
@@ -25,9 +26,7 @@ impl Command for BackTestCommand {
         let symbol = m.get_one::<String>("symbol").unwrap();
         log::info!("Backtest {symbol}");
 
-        // temporary value dropped while borrowed
-        // TODO: make the format better
-        let _ = BackTestGolden::new()
+        BackTestGolden::new()
             .set_broker(100_000.0)
             .set_data_feed(symbol)
             .set_strategy(BaseStrategy{ name: "test".to_string() })
@@ -37,3 +36,4 @@ impl Command for BackTestCommand {
     }
 
 }
+

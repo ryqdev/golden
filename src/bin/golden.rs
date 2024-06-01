@@ -1,17 +1,12 @@
 //! There are only two hard things in Computer Science:
 //! 1. Cache invalidation
 //! 2. Naming things
-//!
-//! So I will use closure to avoid naming variables or functions
 
 use std::io::Write;
+use tokio::runtime::Builder;
 
 // TODO: golden vs craft
-use golden::{cmds::{Command,
-                   backtest::BackTestCommand,
-                   paper::PaperTradingCommand,
-                   live::LiveTradingCommand}
-};
+use golden::cli;
 
 pub fn init_log() {
     env_logger::Builder::new()
@@ -29,23 +24,26 @@ pub fn init_log() {
         .init();
 }
 
-// TODO: how about using tokio::runtime::Builder?
-#[tokio::main]
-async fn main() -> anyhow::Result<()> {
+/// https://tokio.rs/tokio/tutorial
+/// # Tokio
+/// Tokio is an asynchronous runtime for the Rust programming language.
+/// It provides the building blocks needed for writing networking applications.
+///
+/// ## When not to use Tokio
+/// 1. CPU-bound computations.
+/// 2. Reading a lot of files.
+/// 3. Sending a single web request.
+///
 
+fn main() {
     init_log();
-
-    let cmd = clap::Command::new("golden")
-        .subcommands(vec![
-            BackTestCommand::usage().display_order(1),
-            PaperTradingCommand::usage().display_order(2),
-            LiveTradingCommand::usage().display_order(3)
-        ]);
-
-    match cmd.get_matches().subcommand() {
-        Some(("backtest", sub_m)) => Ok(BackTestCommand::handler(sub_m).await?),
-        Some(("paper-trading", sub_m)) => Ok(PaperTradingCommand::handler(sub_m).await?),
-        Some(("live-trading", sub_m)) => Ok(LiveTradingCommand::handler(sub_m).await?),
-        _ => Err(anyhow::Error::msg("Miss arguments. Please open Makefile to get instructions")),
+    if let Err(err) = Builder::new_multi_thread()
+        .enable_all()
+        .build()
+        .expect("Build tokio runtime failed")
+        .block_on(cli::match_cmds())
+    {
+        println!("{:?}", err);
     }
+
 }
