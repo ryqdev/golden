@@ -127,7 +127,7 @@ impl Golden for BackTestGolden {
         eframe::run_native(
             &format!("backtest {:?}", self.strategy),
             native_options,
-            Box::new(|cc| Box::new(visualization::candle::App{
+            Box::new(|cc| Box::new(visualization::vis::App{
                 candle_data,
                 cash_data,
                 order_data
@@ -135,7 +135,6 @@ impl Golden for BackTestGolden {
         ).expect("Plotting error");
     }
 }
-
 
 // struct PaperGolden {}
 //
