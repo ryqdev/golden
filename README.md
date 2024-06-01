@@ -14,6 +14,7 @@ All in one trading engine
 - [ ] Customed backtest time range
 - [x] Backtest UI
 - [ ] Indicators
+- [ ] Add benchmark in visualization
 
 ### Paper trading & live trading
 - [x] Single live broker: IBKR

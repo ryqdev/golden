@@ -65,11 +65,7 @@ impl eframe::App for App {
                                 .width(2.0)
                                 .name("Cash Line")
                         );
-                });
 
-                Plot::new("plot")
-                    .legend(Legend::default())
-                    .show(ui, |plot_ui| {
                         let net_assets_data: egui_plot::PlotPoints = self.net_assets_data.iter()
                             .enumerate()
                             .map(|(i, value)| [i as f64, value * 1.0])
@@ -81,7 +77,6 @@ impl eframe::App for App {
                                 .name("Net Assets")
                         );
                     });
-
             });
     }
 }
