@@ -2,8 +2,7 @@ use super::Command;
 use anyhow::{Result};
 use clap::{Arg, ArgMatches, Command as ClapCommand};
 use async_trait::async_trait;
-use tungstenite::handshake::client::{generate_key, generate_request};
-use crate::{BaseStrategy, Golden, GoldenModeType};
+use crate::{BackTestGolden, BaseStrategy, Golden};
 
 pub struct BackTestCommand;
 
@@ -28,8 +27,7 @@ impl Command for BackTestCommand {
 
         // temporary value dropped while borrowed
         // TODO: make the format better
-        let _ = Golden::new()
-            .set_mode(GoldenModeType::Backtest)
+        let _ = BackTestGolden::new()
             .set_broker(100_000.0)
             .set_data_feed(symbol)
             .set_strategy(BaseStrategy{ name: "test".to_string() })

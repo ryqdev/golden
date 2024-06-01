@@ -9,12 +9,8 @@ mod visualization;
 pub mod strategy;
 
 use std::fs::File;
-use std::io::Read;
-use egui::Key::O;
-use ibapi::{Client};
 
 use time::OffsetDateTime;
-use err::Error;
 
 #[derive(Debug, Default, Copy, Clone)]
 pub enum Action {
@@ -39,18 +35,13 @@ pub(crate) struct Order {
     pub(crate) size: f64,
 }
 
-struct BackTestClient {
-    pub(crate) cash: Vec<f64>,
-    pub position: Vec<f64>,
-    pub(crate) net_assets: Vec<f64>,
-    pub order: Vec<Order>
-}
 
 #[derive(Default)]
-struct BaseBroker{
-    name: String,
-    client: Option<Client>,
-    backtest_client: Option<BackTestClient>
+struct BacktestBroker {
+    pub cash: Vec<f64>,
+    pub position: Vec<f64>,
+    pub net_assets: Vec<f64>,
+    pub order: Vec<Order>
 }
 
 #[derive(Debug,Default)]
@@ -59,7 +50,7 @@ pub struct BaseStrategy{
 }
 
 impl BaseStrategy {
-    fn next(&mut self, data: &Bar) -> Order {
+    fn next(&self, data: &Bar) -> Order {
         if data.close > data.open {
             Order{
                 action: Action::Buy,
@@ -75,131 +66,121 @@ impl BaseStrategy {
 
 }
 
-#[derive(Default)]
-pub struct Golden {
-    data: Vec<Bar>,
-    strategy: BaseStrategy,
-    broker: BaseBroker,
-    mode: GoldenModeType,
+trait Golden{
+    // TODO: what is Sized
+    fn new() -> Box<dyn Golden> where Self: Sized;
+    fn run(&mut self) -> &mut dyn Golden;// the last step
+    fn set_data_feed(&mut self, symbol: &str) -> &mut dyn Golden;
+    fn set_broker(&mut self, cash: f64) -> &mut dyn Golden;
+    fn set_strategy(&mut self, strategy: BaseStrategy) -> &mut dyn Golden;
+    fn plot(&self);
 }
 
 
-impl Golden {
+struct BackTestGolden {
+    data: Vec<Bar>,
+    strategy: BaseStrategy,
+    broker: BacktestBroker,
+}
+
+impl Golden for BackTestGolden {
     // TODO: referece or not
-    pub fn new() -> Golden {
-        log::info!("getting golden");
-        Default::default()
+    fn new() -> Box<dyn Golden>
+    // TODO: what is Sized
+    where Self: Sized
+    {
+        log::info!("Get BackTestGolden");
+        Box::new(BackTestGolden {
+            data: Vec::new(),
+            strategy: BaseStrategy::default(),
+            broker: BacktestBroker::default(),
+        })
     }
-    pub fn run(&mut self) -> &Golden {
+
+    // TODO: why not pub?
+    fn run(&mut self) -> &mut dyn Golden{
         log::info!("Running {:?}...", self.strategy);
 
         for bar in self.data.iter() {
-            let order = &self.strategy.next(&bar);
-            // let mut backtest_client = match &self.broker.backtest_client {
-            //     Some(client) => &client,
-            //     None => todo!()
-            // };
-            // let close_price = &bar.close;
+            let order = self.strategy.next(&bar);
+            let cash = self.broker.cash.last().unwrap();
+            let position = self.broker.position.last().unwrap();
 
             match order.action {
                 Action::Buy => {
                     log::info!("Buy: {:?}", order);
+                    // TODO: when to use reference?
+                    self.broker.cash.push(cash - &order.size * bar.close);
+                    self.broker.position.push(position + &order.size);
+                    self.broker.order.push(order);
                 }
                 Action::Sell => {
                     log::info!("Sell: {:?}", order);
+                    self.broker.cash.push(cash + &order.size * bar.close);
+                    self.broker.position.push(position - &order.size);
+                    self.broker.order.push(order);
                 }
-                _ => todo!()
+                _ => {
+                    // TODO: * or to_owned()
+                    self.broker.cash.push(*cash);
+                    self.broker.position.push(*position);
+                }
             }
         }
         self
     }
-    pub fn plot(&self) {
-        // lifetime!!!
-        log::info!("Plotting {:?}...", self.strategy);
-        // let candle_data = &self.data;
-        // let cash_data = match &self.broker.backtest_client {
-        //     Some(client) => &client.cash,
-        //     None => todo!()
-        // };
-        // let net_asset_data = match &self.broker.backtest_client {
-        //     Some(client) => &client.net_assets,
-        //     None => todo!()
-        // };
-        // let order_data = match &self.broker.backtest_client {
-        //     Some(client) => &client.order,
-        //     None => todo!()
-        // };
-        //
-        // let native_options = eframe::NativeOptions::default();
-        // eframe::run_native(
-        //     &format!("backtest {:?}", self.strategy),
-        //     native_options,
-        //     Box::new(|cc| Box::new(visualization::candle::App{
-        //         candle_data,
-        //         cash_data,
-        //         net_asset_data,
-        //         order_data
-        //     })),
-        // ).expect("Plotting error");
-    }
-    pub fn set_data_feed(&mut self, symbol: &str) -> &mut Golden{
-        log::info!("set data feed");
-        self.data = match self.mode{
-            // .iter()     : borrows the ownership
-            // .into_iter(): transfers the ownership
-            GoldenModeType::Backtest => get_bar_from_csv(symbol).unwrap(),
-            GoldenModeType::Paper => todo!(),
 
-            // GoldenModeType::Paper => self.broker.realtime_bars(&Contract {
-            //     symbol: "USD".to_owned(),
-            //     security_type: SecurityType::ForexPair,
-            //     currency: "JPY".to_owned(),
-            //     exchange: "IDEALPRO".to_owned(),
-            //     ..Default::default()
-            // }, BarSize::Sec5, WhatToShow::MidPoint, false).unwrap(),
-
-            GoldenModeType::Live => todo!()
-        };
+    fn set_data_feed(&mut self, symbol: &str) -> &mut dyn Golden{
+        log::info!("set data feed for {}", symbol);
+        self.data = get_bar_from_csv(symbol).unwrap();
         self
     }
-    pub fn set_mode(&mut self, mode: GoldenModeType) -> &mut Golden{
-        log::info!("set mode");
-        self.mode = mode;
-        self
-    }
-    pub fn set_broker(&mut self, cash: f64) -> &mut Golden {
+    fn set_broker(&mut self, cash: f64) -> &mut dyn Golden {
         log::info!("set broker");
-        self.broker = match self.mode {
-            GoldenModeType::Backtest => BaseBroker{
-                name: "backtest".to_owned(),
-                client: None,
-                backtest_client: Option::from(BackTestClient {
-                    cash: Vec::from([cash]),
-                    position: Vec::from([0.0]),
-                    net_assets: Vec::from([cash]),
-                    order: vec![],
-                })
-
-            },
-            GoldenModeType::Paper => BaseBroker {
-                name: "paper".to_owned(),
-                client: Some(Client::connect("127.0.0.1:7497", 100).unwrap()),
-                backtest_client: None
-            },
-            GoldenModeType::Live => todo!()
+        self.broker = BacktestBroker {
+            cash: Vec::from([cash]),
+            position: Vec::from([0.0]),
+            net_assets: Vec::from([cash]),
+            order: vec![],
         };
         self
     }
-    pub fn set_strategy(&mut self, strategy: BaseStrategy) -> &mut Golden{
+    fn set_strategy(&mut self, strategy: BaseStrategy) -> &mut dyn Golden{
         log::info!("set strategy");
         self.strategy = strategy;
         self
     }
+    // the last step
+    fn plot(&self) {
+        log::info!("Plotting {:?}...", self.strategy);
+        let candle_data = self.data.clone();
+        let cash_data = self.broker.cash.clone();
+        let order_data = self.broker.order.clone();
+
+        let native_options = eframe::NativeOptions::default();
+        eframe::run_native(
+            &format!("backtest {:?}", self.strategy),
+            native_options,
+            Box::new(|cc| Box::new(visualization::candle::App{
+                candle_data,
+                cash_data,
+                order_data
+            })),
+        ).expect("Plotting error");
+    }
     // pub fn add_analyzer(&mut self, analyzer: Box<dyn Analyzer>) -> &GoldenBuilder {
     //     self
     // }
+
 }
 
+// struct PaperGolden {}
+//
+// impl Golden for PaperGolden{}
+//
+// struct LiveGolden{}
+//
+// impl Golden for LiveGolden {}
 
 
 #[derive(Clone, Debug)]

@@ -4,34 +4,34 @@ use crate::{Bar, Order};
 
 
 
-pub struct App<'a> {
+pub struct App {
     // impl Iterator<Item = ...> can be used in scenarios where the size of object is known and fixed
     // while Box<dyn Interator<Item = ...> is used otherwise
-    pub(crate) candle_data: &'a Box<dyn Iterator<Item=Bar>>,
-    pub cash_data: &'a Vec<f64>,
-    pub net_asset_data: &'a Vec<f64>,
-    pub order_data: &'a Vec<Order>
+
+    pub(crate) candle_data:  Vec<Bar>,
+    pub cash_data: Vec<f64>,
+    pub order_data:  Vec<Order>
 }
 
-fn fetch_box_data(candle_data: &Box<dyn Iterator<Item=Bar>>) -> anyhow::Result<BoxPlot> {
+fn fetch_box_data(candle_data: &Vec<Bar>) -> anyhow::Result<BoxPlot> {
     let red = Color32::from_rgb(255,0,0);
     let green = Color32::from_rgb(0,255,0);
 
     let mut historical_data = vec![];
     let mut idx = 0.0;
 
-    // for record in candle_data {
-    //     let color = if record.close >= record.open {green} else {red};
-    //     historical_data.push(
-    //         BoxElem::new(idx, BoxSpread::new(record.low, record.open, record.open, record.close , record.high)).whisker_width(0.0).fill(color).stroke(Stroke::new(2.0, color)),
-    //     );
-    //     idx += 1.0
-    // }
+    for record in candle_data {
+        let color = if record.close >= record.open {green} else {red};
+        historical_data.push(
+            BoxElem::new(idx, BoxSpread::new(record.low, record.open, record.open, record.close , record.high)).whisker_width(0.0).fill(color).stroke(Stroke::new(2.0, color)),
+        );
+        idx += 1.0
+    }
     Ok(BoxPlot::new(historical_data).name("candle"))
 }
 
 
-impl eframe::App for App<'_> {
+impl eframe::App for App {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::TopBottomPanel::top("Menu").show(ctx, |ui| {
             ctx.request_repaint_after(std::time::Duration::from_millis(200));
@@ -89,7 +89,7 @@ impl eframe::App for App<'_> {
                     .height(1000.0)
                     .width(2000.0)
                     .show(ui, |plot_ui| {
-                        let data = fetch_box_data(self.candle_data).expect("fetch csv data error");
+                        let data = fetch_box_data(&self.candle_data).expect("fetch csv data error");
                         plot_ui.box_plot(data);
                     });
             });
@@ -113,18 +113,6 @@ impl eframe::App for App<'_> {
                                 .color(Color32::GREEN)
                                 .width(2.0)
                                 .name("Total Assets")
-                        );
-
-                        let net_asset_line: egui_plot::PlotPoints = self.net_asset_data.clone()
-                            .into_iter()
-                            .enumerate()
-                            .map(|(i, value)| [i as f64, (value * 1.0) as f64])
-                            .collect();
-                        plot_ui.line(
-                            Line::new(net_asset_line)
-                                .color(Color32::BLUE)
-                                .width(2.0)
-                                .name("Net Assets")
                         );
                     });
             });
