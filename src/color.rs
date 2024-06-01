@@ -7,6 +7,6 @@ pub enum GoldenColor {}
 impl GoldenColor {
     pub const RED: &'static str = "\x1b[41m";
     pub const GREEN: &'static str = "\x1b[42m";
-    pub const YELLOW: &'static str = "\x1b[43m";
+    // pub const YELLOW: &'static str = "\x1b[43m";
     pub const RESET: &'static str = "\x1b[0m";
 }

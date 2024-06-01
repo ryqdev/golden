@@ -129,7 +129,7 @@ impl Golden for BackTestGolden {
         eframe::run_native(
             &format!("backtest {:?}", self.strategy),
             native_options,
-            Box::new(|cc| Box::new(visualization::vis::App{
+            Box::new(|_| Box::new(visualization::vis::App{
                 candle_data,
                 cash_data,
                 net_assets_data,

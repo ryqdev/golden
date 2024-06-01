@@ -1,4 +1,4 @@
-use egui::{Stroke, Color32, ViewportClass};
+use egui::{Stroke, Color32};
 use egui_plot::{Plot, BoxPlot, BoxElem, BoxSpread, Legend, Line};
 use crate::feeds::Bar;
 use crate::broker::backtest::backtest::Order;

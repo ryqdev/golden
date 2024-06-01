@@ -4,8 +4,6 @@ use clap::{Arg, ArgMatches, Command as ClapCommand};
 use async_trait::async_trait;
 pub struct BackTestCommand;
 use crate::strategy::strategy::BaseStrategy;
-use crate::feeds::Bar;
-use crate::broker::backtest::backtest::BacktestBroker;
 
 #[async_trait]
 impl Command for BackTestCommand {
@@ -29,7 +27,7 @@ impl Command for BackTestCommand {
         BackTestGolden::new()
             .set_broker(100_000.0)
             .set_data_feed(symbol)
-            .set_strategy(BaseStrategy{ name: "test".to_string() })
+            .set_strategy(BaseStrategy{})
             .run()
             .set_analyzer()
             .plot();

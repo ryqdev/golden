@@ -5,9 +5,7 @@ use crate::broker::backtest::backtest::{
 use crate::feeds::Bar;
 
 #[derive(Debug,Default)]
-pub struct BaseStrategy{
-    pub(crate) name: String,
-}
+pub struct BaseStrategy{}
 
 impl BaseStrategy {
     pub fn next(&self, data: &Bar) -> Order {

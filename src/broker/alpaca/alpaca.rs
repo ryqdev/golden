@@ -7,3 +7,7 @@ fn main() {
     let (mut socket, response) = connect(Url::parse(BASE_URL).unwrap()).expect("Can't connect");
     println!("{:#?}", response);
 }
+
+pub async fn alpaca_trading() {
+    log::info!("trade with alpaca")
+}

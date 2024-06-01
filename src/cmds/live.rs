@@ -12,7 +12,7 @@ impl Command for LiveTradingCommand {
             .visible_alias("l")
     }
 
-    async fn handler(m: &ArgMatches) -> anyhow::Result<()> {
+    async fn handler(_m: &ArgMatches) -> anyhow::Result<()> {
         log::info!("handle live trading");
         Ok(())
     }
