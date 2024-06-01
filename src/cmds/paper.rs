@@ -47,7 +47,9 @@ impl Command for PaperTradingCommand {
         match BrokerType::from_str(broker) {
             Some(BrokerType::IBKR) => ibkr_trading().await,
             Some(BrokerType::ALPACA) => alpaca_trading().await,
-            _ => {}
+            _ => {
+                log::error!("Broker not matched!")
+            }
         };
         Ok(())
     }
