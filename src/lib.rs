@@ -59,57 +59,47 @@ pub struct BaseStrategy{
 }
 
 impl BaseStrategy {
-    fn next(bar: &Bar) {
+    pub fn next(&self, bar: &Bar) {
     }
 }
 
+#[derive(Default)]
 pub struct Golden {
-    data: Box<dyn Iterator<Item = Bar>>,
+    data: Vec<Bar>,
     strategy: BaseStrategy,
     broker: BaseBroker,
     mode: GoldenModeType,
 }
 
-// TODO: any better implementations?
-impl Default for Golden {
-    fn default() -> Self {
-        Golden {
-            data: Box::new(std::iter::empty()),
-            ..Default::default()
-        }
-    }
-}
-
 
 impl Golden {
+    // TODO: referece or not
     pub fn new() -> Golden {
-        Golden{
-            ..Default::default()
-        }
+        log::info!("getting golden");
+        Default::default()
     }
-    pub fn run(&self) {
+    pub fn run(&self) -> &Golden {
         log::info!("Running {:?}...", self.strategy);
 
-        // .iter()     : borrows the ownership
-        // .into_iter(): transfers the ownership
-        // for bar in self.data {
-            // let order = &self.strategy.next(&bar);
-            // let mut backtest_client = match &self.broker.backtest_client {
-            //     Some(client) => &client,
-            //     None => todo!()
-            // };
-            // let close_price = &bar.close;
+        for bar in self.data.iter() {
+            let order = &self.strategy.next(&bar);
+            let mut backtest_client = match &self.broker.backtest_client {
+                Some(client) => &client,
+                None => todo!()
+            };
+            let close_price = &bar.close;
 
-            // match order.action {
-            //     Action::Buy => {
-            //         log::info!("Buy: {:?}", order);
-            //     }
-            //     Action::Sell => {
-            //         log::info!("Sell: {:?}", order);
-            //     }
-            //     _ => todo!()
-            // }
-        // }
+            match order.action {
+                Action::Buy => {
+                    log::info!("Buy: {:?}", order);
+                }
+                Action::Sell => {
+                    log::info!("Sell: {:?}", order);
+                }
+                _ => todo!()
+            }
+        }
+        self
     }
     pub fn plot(&self) {
         // lifetime!!!
@@ -141,8 +131,11 @@ impl Golden {
         // ).expect("Plotting error");
     }
     pub fn set_data_feed(&mut self, symbol: &str) -> &mut Golden{
+        log::info!("set data feed");
         self.data = match self.mode{
-            GoldenModeType::Backtest => todo!(),
+            // .iter()     : borrows the ownership
+            // .into_iter(): transfers the ownership
+            GoldenModeType::Backtest => get_bar_from_csv(symbol).unwrap(),
             GoldenModeType::Paper => todo!(),
 
             // GoldenModeType::Paper => self.broker.realtime_bars(&Contract {
@@ -158,10 +151,12 @@ impl Golden {
         self
     }
     pub fn set_mode(&mut self, mode: GoldenModeType) -> &mut Golden{
+        log::info!("set mode");
         self.mode = mode;
         self
     }
     pub fn set_broker(&mut self, cash: f64) -> &mut Golden {
+        log::info!("set broker");
         self.broker = match self.mode {
             GoldenModeType::Backtest => BaseBroker{
                 name: "backtest".to_owned(),
@@ -184,6 +179,7 @@ impl Golden {
         self
     }
     pub fn set_strategy(&mut self, strategy: BaseStrategy) -> &mut Golden{
+        log::info!("set strategy");
         self.strategy = strategy;
         self
     }
