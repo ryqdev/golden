@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use golden::{ get_bar_from_csv, example};
+    use golden::{ get_bar_from_csv};
     use std::io::Write;
 
     #[test]
@@ -20,8 +20,7 @@ mod tests {
             .filter_level(log::LevelFilter::Info)
             .init();
 
-        // let bars = get_bar_from_csv("SPY");
-        // log::info!("{:?}", bars)
-        example();
+        let bars = get_bar_from_csv("SPY");
+        log::info!("{:?}", bars)
     }
 }

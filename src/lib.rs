@@ -10,6 +10,7 @@ pub mod strategy;
 
 use std::fs::File;
 use std::io::Read;
+use egui::Key::O;
 use ibapi::{Client};
 
 use time::OffsetDateTime;
@@ -205,67 +206,34 @@ pub struct Bar {
     pub count: i32,
 }
 
-#[derive(Debug)]
-struct Row {
-    label: String,
-    values: Vec<i32>,
+#[derive(Debug, serde::Deserialize, PartialEq)]
+struct CSVData {
+    date: String,
+    open: f64,
+    high: f64,
+    low: f64,
+    close: f64
 }
 
 // https://docs.rs/csv/latest/csv/struct.Reader.html
-pub fn example() -> Result<(), Box<dyn std::error::Error>> {
+pub fn get_bar_from_csv(symbol: &str) -> Result<Vec<Bar>, Box<dyn std::error::Error>> {
     let mut rdr = csv::ReaderBuilder::new()
         .has_headers(true)
-        .from_path("data/SPY.csv")?;
+        .from_reader( File::open(format!("data/{symbol}.csv"))?);
 
-    if let Some(result) = rdr.next() {
-        let record: Row = result?;
-        log::info!("{:?}", record);
-        Ok(())
-    } else {
-        Err(From::from("expected at least one record but got none"))
-    }
-}
-
-fn fetch_csv_data(symbol: &str) -> Result<String, Error> {
-    let mut buffer = String::new();
-    let mut csv_file = File::open(format!("data/{symbol}.csv")).unwrap();
-    csv_file.read_to_string(&mut buffer).expect("TODO: panic message");
-    if buffer.is_empty() {
-        return Err(Error::CSVError);
-    }
-    Ok(buffer)
-}
-
-pub fn get_bar_from_csv(symbol: &str) -> Vec<Bar>{
-    let buffer = fetch_csv_data(symbol).unwrap();
-    let mut lines = buffer.lines();
-    let _ = lines.next().unwrap(); // skip header
-
-    let mut bars: Vec<Bar> = Vec::new();
-    for line in lines {
-        let r: Vec<_> = line.split(',').collect();
-        bars.push(Bar{
-                date: OffsetDateTime::now_utc(),
-                open: r[2].parse().unwrap(),
-                high: r[2].parse().unwrap(),
-                low: r[3].parse().unwrap(),
-                close: r[4].parse().unwrap(),
-                volume: 0.0,
-                wap: 0.0,
-                count: 0,
+    rdr.deserialize::<CSVData>().map(|line| {
+        let record = line?;
+        Ok(Bar {
+            date: OffsetDateTime::now_utc(),
+            open: record.open,
+            high: record.high,
+            low: record.low,
+            close: record.close,
+            volume: 0.0,
+            wap: 0.0,
+            count: 0,
         })
-    }
-    bars
-    // csv_reader.map(move |r| Bar{
-    //     date: OffsetDateTime::now_utc(),
-    //     open: r.1[0],
-    //     high: r.1[1],
-    //     low: r.1[2],
-    //     close: r.1[3],
-    //     volume: 0.0,
-    //     wap: 0.0,
-    //     count: 0,
-    // })
+    }).collect()
 }
 
 // fn connect_and_fetch_market_data() -> impl Iterator<Item = Bar>{
