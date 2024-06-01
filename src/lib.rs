@@ -217,11 +217,10 @@ struct CSVData {
 
 // https://docs.rs/csv/latest/csv/struct.Reader.html
 pub fn get_bar_from_csv(symbol: &str) -> Result<Vec<Bar>, Box<dyn std::error::Error>> {
-    let mut rdr = csv::ReaderBuilder::new()
+    csv::ReaderBuilder::new()
         .has_headers(true)
-        .from_reader( File::open(format!("data/{symbol}.csv"))?);
-
-    rdr.deserialize::<CSVData>().map(|line| {
+        .from_reader( File::open(format!("data/{symbol}.csv"))?)
+        .deserialize::<CSVData>().map(|line| {
         let record = line?;
         Ok(Bar {
             date: OffsetDateTime::now_utc(),

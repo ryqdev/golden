@@ -20,7 +20,8 @@ mod tests {
             .filter_level(log::LevelFilter::Info)
             .init();
 
-        let bars = get_bar_from_csv("SPY");
-        log::info!("{:?}", bars)
+        // from /data/SPY_test.csv
+        assert_eq!(302.4599914550781, get_bar_from_csv("SPY_test").unwrap()[0].open);
+        assert_eq!(304.32000732421875, get_bar_from_csv("SPY_test").unwrap()[0].close);
     }
 }
