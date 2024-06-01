@@ -7,7 +7,7 @@ pub struct LiveTradingCommand;
 #[async_trait]
 impl Command for LiveTradingCommand {
     fn usage() -> ClapCommand {
-        ClapCommand::new("live-trading")
+        ClapCommand::new("live")
             .about("Live trading")
             .visible_alias("l")
     }

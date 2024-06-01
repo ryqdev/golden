@@ -106,7 +106,7 @@ async fn paper_trading(){
 #[async_trait]
 impl Command for PaperTradingCommand {
     fn usage() -> ClapCommand {
-        ClapCommand::new("paper-trading")
+        ClapCommand::new("paper")
             .about("Paper trading")
             .visible_alias("p")
     }

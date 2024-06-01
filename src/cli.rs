@@ -18,8 +18,8 @@ pub async fn match_cmds() -> Result<()> {
         .subcommand()
     {
         Some(("backtest", sub_m)) => Ok(BackTestCommand::handler(sub_m).await?),
-        Some(("paper-trading", sub_m)) => Ok(PaperTradingCommand::handler(sub_m).await?),
-        Some(("live-trading", sub_m)) => Ok(LiveTradingCommand::handler(sub_m).await?),
+        Some(("paper", sub_m)) => Ok(PaperTradingCommand::handler(sub_m).await?),
+        Some(("live", sub_m)) => Ok(LiveTradingCommand::handler(sub_m).await?),
         _ => Err(anyhow::Error::msg("Match commands fails")),
     }
 }

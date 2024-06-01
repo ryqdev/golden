@@ -9,3 +9,4 @@ mod visualization;
 pub mod strategy;
 pub mod cli;
 mod monitor;
+mod color;

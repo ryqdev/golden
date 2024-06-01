@@ -9,7 +9,7 @@ use crate::feeds::{
 use crate::visualization;
 use crate::strategy::strategy::BaseStrategy;
 use crate::broker::backtest::backtest::Action;
-
+use crate::color::GoldenColor;
 
 #[async_trait]
 pub trait Command {
@@ -24,6 +24,8 @@ trait Golden{
     fn set_data_feed(&mut self, symbol: &str) -> &mut dyn Golden;
     fn set_broker(&mut self, cash: f64) -> &mut dyn Golden;
     fn set_strategy(&mut self, strategy: BaseStrategy) -> &mut dyn Golden;
+    fn set_analyzer(&mut self) -> &mut dyn Golden;
+    fn set_monitor(&mut self) -> &mut dyn Golden;
     fn plot(&self);
 }
 
@@ -77,6 +79,7 @@ impl Golden for BackTestGolden {
                     self.broker.position.push(*position);
                 }
             }
+            self.broker.net_assets.push(self.broker.cash.last().unwrap() + self.broker.position.last().unwrap() * bar.close)
         }
         self
     }
@@ -101,7 +104,19 @@ impl Golden for BackTestGolden {
         self.strategy = strategy;
         self
     }
-    // the last step
+
+    fn set_analyzer(&mut self) -> &mut dyn Golden {
+        let p_h = self.broker.net_assets.last().unwrap() - self.broker.net_assets.first().unwrap();
+        let color = if p_h > 0.0 {GoldenColor::GREEN} else {GoldenColor::RED};
+        let reset_color = GoldenColor::RESET;
+        log::info!("{color}P&H: {p_h} {reset_color}");
+        self
+    }
+
+    fn set_monitor(&mut self) -> &mut dyn Golden {
+        todo!()
+    }
+
     fn plot(&self) {
         log::info!("Plotting {:?}...", self.strategy);
         let candle_data = self.data.clone();
@@ -119,9 +134,6 @@ impl Golden for BackTestGolden {
             })),
         ).expect("Plotting error");
     }
-    // pub fn add_analyzer(&mut self, analyzer: Box<dyn Analyzer>) -> &GoldenBuilder {
-    //     self
-    // }
 }
 
 

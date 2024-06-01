@@ -6,6 +6,7 @@ All in one trading engine
 
 ### Backtest
 - [ ] Learn and develop strategies
+- [ ] Backtest configurations
 - [x] Single data feed
 - [x] Single strategy
 - [ ] Multiple data feed

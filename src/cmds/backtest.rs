@@ -31,6 +31,7 @@ impl Command for BackTestCommand {
             .set_data_feed(symbol)
             .set_strategy(BaseStrategy{ name: "test".to_string() })
             .run()
+            .set_analyzer()
             .plot();
         Ok(())
     }
