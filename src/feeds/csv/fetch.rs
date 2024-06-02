@@ -2,23 +2,17 @@ use std::fs::File;
 use time::OffsetDateTime;
 use crate::feeds::Bar;
 use anyhow::Result;
+use super::YFinance;
 
 
-#[derive(Debug, serde::Deserialize, PartialEq)]
-struct CSVData {
-    date: String,
-    open: f64,
-    high: f64,
-    low: f64,
-    close: f64
-}
+
 
 // https://docs.rs/csv/latest/csv/struct.Reader.html
 pub fn get_bar_from_csv(symbol: &str) -> Result<Vec<Bar>> {
     csv::ReaderBuilder::new()
         .has_headers(true)
         .from_reader( File::open(format!("data/{symbol}.csv"))?)
-        .deserialize::<CSVData>().map(|line| {
+        .deserialize::<YFinance>().map(|line| {
         let record = line?;
         Ok(Bar {
             date: OffsetDateTime::now_utc(),
