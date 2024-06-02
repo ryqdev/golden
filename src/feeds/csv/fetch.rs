@@ -64,8 +64,6 @@ pub async fn get_bar_from_yahoo(symbol: &str, save_csv: bool) -> Result<Vec<YFin
         .collect();
 
     if save_csv {
-        fs::create_dir_all("/data")?;
-
         let mut wtr = csv::WriterBuilder::new().from_path(format!("data/{symbol}.csv"))?;
 
         // Set header for csv file.
