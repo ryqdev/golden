@@ -1,4 +1,4 @@
-use std::fs::File;
+use std::fs;
 use time::OffsetDateTime;
 use crate::feeds::Bar;
 use anyhow::Result;
@@ -7,9 +7,10 @@ use super::YFinance;
 
 // https://docs.rs/csv/latest/csv/struct.Reader.html
 pub fn get_bar_from_csv(symbol: &str) -> Result<Vec<Bar>> {
+    // TODO: add a feature: if the csv data is not exist, download it from yahoo finance
     csv::ReaderBuilder::new()
         .has_headers(true)
-        .from_reader( File::open(format!("data/{symbol}.csv"))?)
+        .from_reader( fs::File::open(format!("data/{symbol}.csv"))?)
         .deserialize::<YFinance>()
         .map(|line| {
         let record = line?;
@@ -63,6 +64,8 @@ pub async fn get_bar_from_yahoo(symbol: &str, save_csv: bool) -> Result<Vec<YFin
         .collect();
 
     if save_csv {
+        fs::create_dir_all("/data")?;
+
         let mut wtr = csv::WriterBuilder::new().from_path(format!("data/{symbol}.csv"))?;
 
         // Set header for csv file.

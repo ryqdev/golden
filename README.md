@@ -26,3 +26,20 @@ All in one trading engine
 ```shell
  make backtest symbol=SPY
 ```
+
+## Quick Install
+```shell
+cargo install golden
+```
+
+## Commands
+```shell
+# download csv to data/
+golden csv --symbol SPY
+
+# backtest
+golden backtest --symbol SPY
+
+# paper trading
+golden paper --broker ibkr
+```
