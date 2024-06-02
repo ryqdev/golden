@@ -23,7 +23,7 @@ Inspired by `backtrader`, `golden` aims to build all-in-one trading engine suppo
 ### On windows:
 Download csv data from yahoo finance:
 ![image](https://github.com/ryqdev/golden/assets/50010920/cd49ac08-6529-473a-90fb-c645b8154498)
-Backtest with simple strategy:
+Backtest with a simple strategy:
 ![image](https://github.com/ryqdev/golden/assets/50010920/e03e639e-f4e2-41fb-b25e-09f3b5156cfd)
 
 ## Quick Install
