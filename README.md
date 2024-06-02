@@ -26,9 +26,24 @@ Download csv data from yahoo finance:
 Backtest with simple strategy:
 ![image](https://github.com/ryqdev/golden/assets/50010920/e03e639e-f4e2-41fb-b25e-09f3b5156cfd)
 
+## Quick Install
 
+```shell
+cargo install golden
+```
 
+## Useful Commands
 
+```shell
+# download csv to data/
+golden csv --symbol SPY
+
+# backtest
+golden backtest --symbol SPY
+
+# paper trading
+golden paper --broker ibkr
+```
 
 
 
@@ -77,35 +92,6 @@ Backtest with simple strategy:
 - [ ] Remote deployment
 - [ ] Multi-strategy system design
 
-
-
-
-## Demo
-
-```shell
-make backtest symbol=SPY
-```
-
-TODO: add more
-
-## Quick Install
-
-```shell
-cargo install golden
-```
-
-## Commands
-
-```shell
-# download csv to data/
-golden csv --symbol SPY
-
-# backtest
-golden backtest --symbol SPY
-
-# paper trading
-golden paper --broker ibkr
-```
 
 
 ## Reference
