@@ -23,6 +23,7 @@ Inspired by `backtrader`, `golden` aims to build all in one trading engine suppo
 - [ ] Set configuration with a local toml file
 - [ ] Set configuration with UI
 - [x] Publish it to crate.io
+- [ ] Customed Strategy writing
 
 
 ### Backtest features list
