@@ -139,13 +139,77 @@ impl Golden for BackTestGolden {
     }
 }
 
-// struct PaperGolden {}
-//
-// impl Golden for PaperGolden{}
-//
-// struct LiveGolden{}
-//
-// impl Golden for LiveGolden {}
+struct PaperGolden {}
+
+impl Golden for PaperGolden{
+    fn new() -> Box<dyn Golden> where Self: Sized {
+        todo!()
+    }
+
+    fn run(&mut self) -> &mut dyn Golden {
+        todo!()
+    }
+
+    fn set_data_feed(&mut self, symbol: &str) -> &mut dyn Golden {
+        todo!()
+    }
+
+    fn set_broker(&mut self, cash: f64) -> &mut dyn Golden {
+        todo!()
+    }
+
+    fn set_strategy(&mut self, strategy: BaseStrategy) -> &mut dyn Golden {
+        todo!()
+    }
+
+    fn set_analyzer(&mut self) -> &mut dyn Golden {
+        todo!()
+    }
+
+    fn set_monitor(&mut self) -> &mut dyn Golden {
+        todo!()
+    }
+
+    fn plot(&self) {
+        todo!()
+    }
+}
+
+struct LiveGolden{}
+
+impl Golden for LiveGolden {
+    fn new() -> Box<dyn Golden> where Self: Sized {
+        todo!()
+    }
+
+    fn run(&mut self) -> &mut dyn Golden {
+        todo!()
+    }
+
+    fn set_data_feed(&mut self, symbol: &str) -> &mut dyn Golden {
+        todo!()
+    }
+
+    fn set_broker(&mut self, cash: f64) -> &mut dyn Golden {
+        todo!()
+    }
+
+    fn set_strategy(&mut self, strategy: BaseStrategy) -> &mut dyn Golden {
+        todo!()
+    }
+
+    fn set_analyzer(&mut self) -> &mut dyn Golden {
+        todo!()
+    }
+
+    fn set_monitor(&mut self) -> &mut dyn Golden {
+        todo!()
+    }
+
+    fn plot(&self) {
+        todo!()
+    }
+}
 
 
 pub mod backtest;

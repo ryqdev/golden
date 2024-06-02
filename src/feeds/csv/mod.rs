@@ -1,8 +1,7 @@
 pub mod fetch;
-pub(crate) mod download;
 
 #[derive(Debug, serde::Deserialize, PartialEq)]
-struct YFinance {
+pub struct YFinance {
     date: String,
     open: f64,
     high: f64,

@@ -3,10 +3,9 @@ use clap::{Arg, ArgMatches, Command as ClapCommand};
 use super::Command;
 use anyhow::Result;
 use async_trait::async_trait;
-use crate::feeds::csv::download::download;
+use crate::feeds::csv::fetch::get_bar_from_yahoo;
 
 pub struct CSVCommand;
-
 
 
 #[async_trait]
@@ -27,7 +26,7 @@ impl Command for CSVCommand {
     async fn handler(m: &ArgMatches) -> Result<()> {
         let symbol = m.get_one::<String>("symbol").unwrap();
         log::info!("Download {symbol} data");
-        download(symbol).await?;
+        get_bar_from_yahoo(symbol, true).await?;
         Ok(())
     }
 }

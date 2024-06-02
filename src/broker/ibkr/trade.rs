@@ -39,19 +39,15 @@ impl BreakoutChannel {
     }
 }
 
+/// https://github.com/wboayue/rust-ibapi
+/// But his work is not finished, lacking many features, e.g.:
+/// 1. Contract::stock() only supports stock, futures and crypto.
+/// 2. BarSize only supports Sec5
 pub async  fn ibkr_trading(){
+    // TODO: use PaperGolden
     log::info!("trade with ibkr");
 
     let client = Client::connect("127.0.0.1:7497", 100).unwrap();
-
-    // let contract = Contract {
-    //     symbol: "TSLA".to_string(),
-    //     security_type: SecurityType::Stock,
-    //     currency: "USD".to_string(),
-    //     exchange: "SMART".to_string(),
-    //     ..Default::default()
-    // };
-
 
     let contract = Contract {
         symbol: "USD".to_owned(),
@@ -69,7 +65,6 @@ pub async  fn ibkr_trading(){
         log::info!("\x1b[93m bar:\x1b[0m {:?} ", bar);
         channel.add_bar(&bar);
 
-        // Ensure enough bars and no open positions.
         if !channel.ready() {
             continue;
         }
@@ -88,9 +83,9 @@ pub async  fn ibkr_trading(){
         let notices = client.place_order(order_id, &contract, &order).unwrap();
         for notice in notices {
             if let OrderNotification::ExecutionData(data) = notice {
-                println!("{} {} shares of {}", data.execution.side, data.execution.shares, data.contract.symbol);
+                log::info!("{} {} shares of {}", data.execution.side, data.execution.shares, data.contract.symbol);
             } else {
-                println!("{:?}", notice);
+                log::info!("{:?}", notice);
             }
         }
     }

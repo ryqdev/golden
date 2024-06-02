@@ -13,7 +13,6 @@ impl Command for LiveTradingCommand {
     }
 
     async fn handler(_m: &ArgMatches) -> anyhow::Result<()> {
-        log::info!("handle live trading");
-        Ok(())
+        todo!()
     }
 }
