@@ -1,13 +1,13 @@
 # golden
 
-`golden` is all in one trading engine built with Rust.
+`golden` is all-in-one trading engine built with Rust.
 
 There are many public algorithmic trading platforms like [QuantConnect](https://www.quantconnect.com/) and [JoinQuant](https://www.joinquant.com/) for individual traders to learn, research, backtest and live-trading.
  However, we still need private algorithmic trading platform for many reasons such as strategy privacy, system stability and other customed features.
 
 One of the well-known private trading libraries is [Backtrader](https://github.com/mementum/backtrader) with Python, but the community is not active recently, since It hasn't been updated since Apr 19, 2023. I also built a [simple project](https://github.com/ryqdev/silver) based on [backtrader](https://github.com/mementum/backtrader) and [ib_insync](https://github.com/ultra1971/backtrader_ib_insync), but it still need a lot of work to do to meet real world trading requirements.
 
-Inspired by `backtrader`, `golden` aims to build all in one trading engine supporting backtesting, analyzing, paper-trading and live-trading.
+Inspired by `backtrader`, `golden` aims to build all-in-one trading engine supporting backtesting, analyzing, paper-trading and live-trading.
 
 
 
