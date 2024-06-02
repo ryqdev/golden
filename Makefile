@@ -1,4 +1,4 @@
-backtest: csv
+backtest:
 	cargo run backtest --symbol ${symbol}
 
 paper:
