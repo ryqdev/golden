@@ -28,7 +28,7 @@ pub async fn download(symbol: &str) -> Result<()> {
     log::info!("Status Code: {}", response.status());
     let response_body = response.text().await?;
 
-    // alloc::string::String
+    // type of response_body:  alloc::string::String
     log::info!("Response body: {}", response_body);
 
     let finance_data: Vec<YFinance> = csv::ReaderBuilder::new()
@@ -40,7 +40,11 @@ pub async fn download(symbol: &str) -> Result<()> {
         .collect();
 
     let mut wtr = csv::WriterBuilder::new().from_path(format!("data/{symbol}.csv"))?;
+
+    // set header
     wtr.write_record(&["date", "open", "high", "low", "close", "adj_close", "volume"])?;
+
+    // set record
     for record in finance_data {
         wtr.write_record(&[
             record.date,

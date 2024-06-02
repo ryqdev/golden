@@ -1,4 +1,4 @@
-pub(crate) mod fetch;
+pub mod fetch;
 pub(crate) mod download;
 
 #[derive(Debug, serde::Deserialize, PartialEq)]

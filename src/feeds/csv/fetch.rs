@@ -21,6 +21,7 @@ pub fn get_bar_from_csv(symbol: &str) -> Result<Vec<Bar>> {
             high: record.high,
             low: record.low,
             close: record.close,
+            // leave volume, wap and count blank
             volume: 0.0,
             wap: 0.0,
             count: 0,
