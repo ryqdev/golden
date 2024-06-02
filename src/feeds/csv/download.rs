@@ -16,7 +16,8 @@ use super::YFinance;
 /// https://stackoverflow.com/questions/78111453/yahoo-finance-api-file-get-contents-429-too-many-requests
 /// add User Agent to solve `429` error
 pub async fn download(symbol: &str) -> Result<()> {
-    let url = "https://query1.finance.yahoo.com/v7/finance/download/TLT?period1=345479400&period2=1717257709&interval=1d&events=history&includeAdjustedClose=true";
+    // TODO: change the period
+    let url = format!("https://query1.finance.yahoo.com/v7/finance/download/{symbol}?period1=345479400&period2=1717257709&interval=1d&events=history&includeAdjustedClose=true");
 
     let client = reqwest::Client::builder()
         .user_agent("curl/7.68.0")
@@ -28,17 +29,30 @@ pub async fn download(symbol: &str) -> Result<()> {
     let response_body = response.text().await?;
 
     // alloc::string::String
-    // log::info!("Response body: {}", response_body.to_string());
+    log::info!("Response body: {}", response_body);
 
-    let finance_data: Vec<_> = csv::ReaderBuilder::new()
+    let finance_data: Vec<YFinance> = csv::ReaderBuilder::new()
         .from_reader(response_body.as_bytes())
-        .records().collect();
+        .records()
+        .map(|record| {
+            record.unwrap().deserialize::<YFinance>(None).unwrap()
+        })
+        .collect();
 
-    let finance_data : Vec<YFinance> = finance_data.into_iter().map(|record| {
-        let r = record.unwrap().deserialize::<YFinance>(None).unwrap();
-        r
-    }).collect();
-    log::info!("data: {:?}", finance_data[0]);
+    let mut wtr = csv::WriterBuilder::new().from_path(format!("data/{symbol}.csv"))?;
+    wtr.write_record(&["date", "open", "high", "low", "close", "adj_close", "volume"])?;
+    for record in finance_data {
+        wtr.write_record(&[
+            record.date,
+            record.open.to_string(),
+            record.high.to_string(),
+            record.low.to_string(),
+            record.close.to_string(),
+            record.adj_close.to_string(),
+            record.volume.to_string(),
+        ])?;
+    }
+    wtr.flush()?;
 
     Ok(())
 }
