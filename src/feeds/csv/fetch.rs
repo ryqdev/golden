@@ -7,7 +7,7 @@ use super::YFinance;
 
 // https://docs.rs/csv/latest/csv/struct.Reader.html
 pub fn get_bar_from_csv(symbol: &str) -> Result<Vec<Bar>> {
-    // TODO: add a feature: if the csv data is not exist, download it from yahoo finance
+    // TODO: add a feature in the future: if the csv data is not exist, download it from yahoo finance
     csv::ReaderBuilder::new()
         .has_headers(true)
         .from_reader( fs::File::open(format!("data/{symbol}.csv"))?)
@@ -40,7 +40,7 @@ pub fn get_bar_from_csv(symbol: &str) -> Result<Vec<Bar>> {
 /// add User Agent to solve `429` error
 pub async fn get_bar_from_yahoo(symbol: &str, save_csv: bool) -> Result<Vec<YFinance>> {
     // Currently, the period is from 2023/01/01:00:00:00 to 2024/01/01:00:00:00
-    // Will add more configuration if I have time
+    // TODO: add more configuration in the future
     let url = format!("https://query1.finance.yahoo.com/v7/finance/download/{symbol}?period1=1672502400&period2=1704038400&interval=1d&events=history&includeAdjustedClose=true");
 
     let client = reqwest::Client::builder()

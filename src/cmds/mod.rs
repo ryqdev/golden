@@ -18,7 +18,7 @@ pub trait Command {
 }
 
 trait Golden{
-    // TODO: what is Sized
+    // https://stackoverflow.com/questions/30938499/why-is-the-sized-bound-necessary-in-this-trait
     fn new() -> Box<dyn Golden> where Self: Sized;
     fn run(&mut self) -> &mut dyn Golden;// the last step
     fn set_data_feed(&mut self, symbol: &str) -> &mut dyn Golden;
@@ -37,9 +37,7 @@ pub struct BackTestGolden {
 
 
 impl Golden for BackTestGolden {
-    // TODO: referece or not
     fn new() -> Box<dyn Golden>
-    // TODO: what is Sized
         where Self: Sized
     {
         log::info!("Get BackTestGolden");
@@ -50,7 +48,6 @@ impl Golden for BackTestGolden {
         })
     }
 
-    // TODO: why not pub?
     fn run(&mut self) -> &mut dyn Golden{
         log::info!("Running {:?}...", self.strategy);
 
@@ -62,19 +59,17 @@ impl Golden for BackTestGolden {
             match order.action {
                 Action::Buy => {
                     log::info!("Buy: {:?}", order);
-                    // TODO: when to use reference?
-                    self.broker.cash.push(cash - &order.size * bar.close);
-                    self.broker.position.push(position + &order.size);
+                    self.broker.cash.push(cash - order.size * bar.close);
+                    self.broker.position.push(position + order.size);
                     self.broker.order.push(order);
                 }
                 Action::Sell => {
                     log::info!("Sell: {:?}", order);
-                    self.broker.cash.push(cash + &order.size * bar.close);
-                    self.broker.position.push(position - &order.size);
+                    self.broker.cash.push(cash + order.size * bar.close);
+                    self.broker.position.push(position - order.size);
                     self.broker.order.push(order);
                 }
                 _ => {
-                    // TODO: * or to_owned()
                     self.broker.cash.push(*cash);
                     self.broker.position.push(*position);
                 }

@@ -1,11 +1,6 @@
-//! There are only two hard things in Computer Science:
-//! 1. Cache invalidation
-//! 2. Naming things
-
 use std::io::Write;
 use tokio::runtime::Builder;
 
-// TODO: golden vs craft
 use golden::cli;
 
 pub fn init_log() {
