@@ -1,4 +1,20 @@
-//! TODO: readme
+//! # Quick Install
+//! ```shell
+//! cargo install golden
+//! ```
+//!
+//! ## Useful Commands
+//! ```shell
+//! # download csv to data/
+//! golden csv --symbol SPY
+//!
+//! # backtest
+//! golden backtest --symbol SPY
+//!
+//! # paper trading
+//! golden paper --broker ibkr
+//!
+//! ```
 
 pub mod cmds;
 pub mod feeds;
