@@ -26,7 +26,8 @@ Download csv data from yahoo finance:
 Backtest with a simple strategy:
 ![image](https://github.com/ryqdev/golden/assets/50010920/86035e40-8203-4526-abba-c932a02553af)
 Paper trading with IBKR TWS
-![Uploading image.png…]()
+![image](https://github.com/ryqdev/golden/assets/50010920/5f4e699b-ad97-4858-8626-e0c88f992567)
+
 
 ### On Windows:
 Download csv data from yahoo finance:
