@@ -62,6 +62,7 @@ golden paper --broker ibkr
 - [ ] Set configuration with UI
 - [x] Publish it to crate.io
 - [ ] Customed Strategy writing
+- [ ] DB design
 
 
 ### Backtest features list
