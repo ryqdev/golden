@@ -24,6 +24,7 @@ impl Command for BackTestCommand {
         let symbol = m.get_one::<String>("symbol").unwrap();
         log::info!("Backtest {symbol}");
 
+        // TODO: use Builder?
         BackTestGolden::new()
             .set_broker(100_000.0)
             .set_data_feed(symbol)

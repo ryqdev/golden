@@ -1,6 +1,4 @@
 use std::io::Write;
-use tokio::runtime::Builder;
-
 use golden::cli;
 
 pub fn init_log() {
@@ -21,24 +19,24 @@ pub fn init_log() {
 
 /// https://tokio.rs/tokio/tutorial
 /// # Tokio
-/// Tokio is an asynchronous runtime for the Rust programming language.
-/// It provides the building blocks needed for writing networking applications.
+/// Tokio is an asynchronous runtime for the Rust programming language, especially for non-blocking IO
 ///
 /// ## When not to use Tokio
 /// 1. CPU-bound computations.
 /// 2. Reading a lot of files.
 /// 3. Sending a single web request.
 ///
-
+/// ## Tokio provides two runtime modes:
+/// 1. single thread runtime: new_current_thread
+/// 2. multi thread runtime: new_multi_thread
+///
+/// In low latency trading system, possibly single thread is better.
+///
 fn main() {
     init_log();
-    if let Err(err) = Builder::new_multi_thread()
-        .enable_all()
+    tokio::runtime::Builder::new_current_thread()
         .build()
         .expect("Build tokio runtime failed")
         .block_on(cli::match_cmds())
-    {
-        println!("{:?}", err);
-    }
-
+        .unwrap()
 }

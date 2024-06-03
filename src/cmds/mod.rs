@@ -4,7 +4,10 @@ use async_trait::async_trait;
 use crate::broker::backtest::backtest::BacktestBroker;
 use crate::feeds::{
     Bar,
-    csv::fetch::get_bar_from_csv
+    csv::fetch::{
+        get_bar_from_csv,
+        get_bar_from_yahoo
+    }
 };
 use crate::visualization;
 use crate::strategy::strategy::BaseStrategy;
