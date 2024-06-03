@@ -58,8 +58,10 @@ pub async fn ibkr_trading(){
             continue;
         };
 
+        previous_bar = bar;
+
         let order_id = client.next_order_id();
-        let order = order_builder::market_order(action, 1000.0);
+        let order = order_builder::market_order(action, 10000.0);
 
         let notices = client.place_order(order_id, &contract, &order).unwrap();
         for notice in notices {
