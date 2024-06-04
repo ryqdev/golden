@@ -1,5 +1,6 @@
 use std::io::Write;
 use golden::cli;
+use golden::cli::match_cmds;
 
 pub fn init_log() {
     env_logger::Builder::new()
@@ -30,13 +31,28 @@ pub fn init_log() {
 /// 1. single thread runtime: new_current_thread
 /// 2. multi thread runtime: new_multi_thread
 ///
-/// In low latency trading system, possibly single thread is better.
+/// In low trading system, assign one strategy with single thread runtime is possibly better.
 ///
-fn main() {
+/// TODO: need benchmark test
+///
+/// ```rust
+/// fn main() {
+///     init_log();
+///     tokio::runtime::Builder::new_current_thread() // single thread mode
+///        .enable_all() //Enables both I/ O and time drivers.
+///         .build()
+///         .expect("Build tokio runtime failed")
+///         .block_on(cli::match_cmds()) // block_on will block main thread
+///         .unwrap()
+/// }
+/// ```
+
+// another simpler way to use tokio
+// TODO: use `serveral` single-thread runtimes or `one` multi-thread runtime?
+#[tokio::main(flavor = "current_thread")]
+async fn main() {
     init_log();
-    tokio::runtime::Builder::new_current_thread()
-        .build()
-        .expect("Build tokio runtime failed")
-        .block_on(cli::match_cmds())
-        .unwrap()
+    match_cmds().await.expect("match error");
 }
+
+// https://tokio.rs/blog/2019-10-scheduler
