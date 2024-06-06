@@ -51,9 +51,9 @@ pub async fn ibkr_trading(){
         // -ln(today's open / yesterday's close)
 
         let action = if bar.open > previous_bar.close {
-            Action::Sell
-        } else if bar.open < previous_bar.close{
             Action::Buy
+        } else if bar.open < previous_bar.close{
+            Action::Sell
         } else {
             continue;
         };

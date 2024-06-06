@@ -1,5 +1,4 @@
 use std::io::Write;
-use golden::cli;
 use golden::cli::match_cmds;
 
 pub fn init_log() {
