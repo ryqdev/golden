@@ -34,6 +34,9 @@ Download csv data from yahoo finance:
 ![image](https://github.com/ryqdev/golden/assets/50010920/cd49ac08-6529-473a-90fb-c645b8154498)
 Backtest with a simple strategy:
 ![image](https://github.com/ryqdev/golden/assets/50010920/e03e639e-f4e2-41fb-b25e-09f3b5156cfd)
+Paper trading with IBKR TWS:
+![image](https://github.com/ryqdev/golden/assets/50010920/9da6a5b4-5fe0-4f57-8ace-92d81d70cc9d)
+
 
 ## Quick Install
 ```shell
