@@ -1,0 +1,6 @@
+[config]
+broker = "Basetest"
+symbol = "TLT"
+time = "Default"
+strategy = "Test"
+cash = 100_000

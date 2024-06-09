@@ -1,7 +1,9 @@
-use super::{Command, BackTestGolden, Golden};
+use super::{Command, BackTestGolden, Golden, parse_config, strategy_mapping};
 use anyhow::{Result};
 use clap::{Arg, ArgMatches, Command as ClapCommand};
 use async_trait::async_trait;
+use crate::feeds::csv::fetch::get_bar_from_yahoo;
+
 pub struct BackTestCommand;
 use crate::strategy::strategy::BaseStrategy;
 
@@ -21,17 +23,18 @@ impl Command for BackTestCommand {
     }
 
     async fn handler(m: &ArgMatches) -> Result<()> {
-        let symbol = m.get_one::<String>("symbol").unwrap();
-        log::info!("Backtest {symbol}");
+        let toml_data = parse_config()?;
+        // let symbol = m.get_one::<String>("symbol").unwrap();
+        log::info!("Backtest {:?}", toml_data);
+        get_bar_from_yahoo(&toml_data.config.symbol, true).await?;
 
-        // TODO: use Builder?
         BackTestGolden::new()
-            .set_broker(100_000.0)
-            .set_data_feed(symbol)
-            .set_strategy(BaseStrategy{})
+            .set_broker(toml_data.config.cash)
+            .set_data_feed(&toml_data.config.symbol)
+            .set_strategy(strategy_mapping(&toml_data.config.strategy))
             .run()
             .set_analyzer()
-            .plot();
+            .plot(toml_data.config.symbol);
         Ok(())
     }
 

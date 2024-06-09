@@ -6,8 +6,10 @@ use anyhow::Result;
 
 
 pub struct App {
+    pub symbol: String,
     pub candle_data:  Vec<Bar>,
     pub cash_data: Vec<f64>,
+    pub base_line_data: Vec<f64>,
     pub net_assets_data: Vec<f64>,
     pub order_data:  Vec<Order>
 }
@@ -41,7 +43,7 @@ impl eframe::App for App {
 
         egui::Window::new("Candle")
             .show(ctx, |ui|{
-                ui.label("Candle");
+                ui.label(&self.symbol);
 
                 Plot::new("plot")
                     .legend(Legend::default())
@@ -56,15 +58,27 @@ impl eframe::App for App {
                 Plot::new("plot")
                     .legend(Legend::default())
                     .show(ui, |plot_ui| {
-                        let cash_line: egui_plot::PlotPoints = self.cash_data.iter()
+                        // let cash_line: egui_plot::PlotPoints = self.cash_data.iter()
+                        //     .enumerate()
+                        //     .map(|(i, value)| [i as f64, value * 1.0])
+                        //     .collect();
+                        // plot_ui.line(
+                        //     Line::new(cash_line)
+                        //         .color(Color32::GREEN)
+                        //         .width(2.0)
+                        //         .name("Cash Line")
+                        // );
+
+                        let base_line_shares = self.cash_data[0] / self.base_line_data[0];
+                        let base_line: egui_plot::PlotPoints = self.base_line_data.iter()
                             .enumerate()
-                            .map(|(i, value)| [i as f64, value * 1.0])
+                            .map(|(i, value)| [i as f64, value * base_line_shares])
                             .collect();
                         plot_ui.line(
-                            Line::new(cash_line)
-                                .color(Color32::GREEN)
+                            Line::new(base_line)
+                                .color(Color32::BLUE)
                                 .width(2.0)
-                                .name("Cash Line")
+                                .name("Base Line")
                         );
 
                         let net_assets_data: egui_plot::PlotPoints = self.net_assets_data.iter()

@@ -1,5 +1,5 @@
 backtest:
-	cargo run backtest --symbol ${symbol}
+	cargo run backtest
 
 paper:
 	cargo run paper --broker ${broker}
@@ -9,4 +9,4 @@ live:
 	cargo run live
 
 csv:
-	cargo run csv --symbol ${symbol}
+	cargo run csv

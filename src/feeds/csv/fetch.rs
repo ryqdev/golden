@@ -1,3 +1,4 @@
+use std::collections::hash_set::SymmetricDifference;
 use std::fs;
 use time::OffsetDateTime;
 use crate::feeds::Bar;
@@ -28,6 +29,18 @@ pub fn get_bar_from_csv(symbol: &str) -> Result<Vec<Bar>> {
     }).collect()
 }
 
+pub fn get_close_price_from_csv(symbol: &str) -> Result<Vec<f64>> {
+    csv::ReaderBuilder::new()
+        .has_headers(true)
+        .from_reader( fs::File::open(format!("data/{symbol}.csv"))?)
+        .deserialize::<YFinance>()
+        .map(|line| {
+            let record = line?;
+            Ok(
+               record.close
+            )
+        }).collect()
+}
 
 /// https://rust-lang-nursery.github.io/rust-cookbook/web/clients/requests.html
 /// Example url to download historial csv data: https://query1.finance.yahoo.com/v7/finance/download/TLT?period1=345479400&period2=1717257709&interval=1d&events=history&includeAdjustedClose=true
@@ -40,6 +53,7 @@ pub async fn get_bar_from_yahoo(symbol: &str, save_csv: bool) -> Result<Vec<YFin
     // Currently, the period is from 2023/01/01:00:00:00 to 2024/01/01:00:00:00
     // TODO: add more configuration in the future
     let url = format!("https://query1.finance.yahoo.com/v7/finance/download/{symbol}?period1=1672502400&period2=1704038400&interval=1d&events=history&includeAdjustedClose=true");
+    // let url = "https://query1.finance.yahoo.com/v7/finance/download/TLT?period1=345479400&period2=1717257709&interval=1d&events=history&includeAdjustedClose=true".to_string();
 
     let client = reqwest::Client::builder()
         .user_agent("curl/7.68.0")

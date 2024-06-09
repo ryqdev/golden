@@ -6,13 +6,18 @@ use crate::feeds::{
     Bar,
     csv::fetch::{
         get_bar_from_csv,
-        get_bar_from_yahoo
+        get_bar_from_yahoo,
+        get_close_price_from_csv
     }
 };
 use crate::visualization;
 use crate::strategy::strategy::BaseStrategy;
 use crate::broker::backtest::backtest::Action;
 use crate::color::GoldenColor;
+use serde_derive::Deserialize;
+use std::fs;
+use eframe::egui_glow::check_for_gl_error_even_in_release;
+
 
 #[async_trait]
 pub trait Command {
@@ -29,7 +34,7 @@ trait Golden{
     fn set_strategy(&mut self, strategy: BaseStrategy) -> &mut dyn Golden;
     fn set_analyzer(&mut self) -> &mut dyn Golden;
     fn set_monitor(&mut self) -> &mut dyn Golden;
-    fn plot(&self);
+    fn plot(&self, symbol: String);
 }
 
 pub struct BackTestGolden {
@@ -58,19 +63,33 @@ impl Golden for BackTestGolden {
             let order = self.strategy.next(&bar);
             let cash = self.broker.cash.last().unwrap();
             let position = self.broker.position.last().unwrap();
-
+            log::info!("Cash: {:?}, Position: {:?}", cash, position);
             match order.action {
                 Action::Buy => {
                     log::info!("Buy: {:?}", order);
-                    self.broker.cash.push(cash - order.size * bar.close);
-                    self.broker.position.push(position + order.size);
-                    self.broker.order.push(order);
+                    if *cash < 0.0 {
+                        log::error!("cash is smaller than 0. Cannot buy");
+                        self.broker.cash.push(*cash);
+                        self.broker.position.push(*position);
+                        self.broker.order.push(order);
+                    } else {
+                        self.broker.cash.push(cash - order.size * bar.close);
+                        self.broker.position.push(position + order.size);
+                        self.broker.order.push(order);
+                    }
                 }
                 Action::Sell => {
                     log::info!("Sell: {:?}", order);
-                    self.broker.cash.push(cash + order.size * bar.close);
-                    self.broker.position.push(position - order.size);
-                    self.broker.order.push(order);
+                    if *position < 0.0 {
+                        log::error!("position is smaller than 0. Cannot sell");
+                        self.broker.cash.push(*cash);
+                        self.broker.position.push(*position);
+                        self.broker.order.push(order);
+                    } else {
+                        self.broker.cash.push(cash + order.size * bar.close);
+                        self.broker.position.push(position - order.size);
+                        self.broker.order.push(order);
+                    }
                 }
                 _ => {
                     self.broker.cash.push(*cash);
@@ -116,10 +135,11 @@ impl Golden for BackTestGolden {
         todo!()
     }
 
-    fn plot(&self) {
+    fn plot(&self, symbol: String) {
         log::info!("Plotting {:?}...", self.strategy);
         let candle_data = self.data.clone();
         let cash_data = self.broker.cash.clone();
+        let base_line_data = get_close_price_from_csv(&symbol).unwrap();
         let order_data = self.broker.order.clone();
         let net_assets_data = self.broker.net_assets.clone();
 
@@ -128,8 +148,10 @@ impl Golden for BackTestGolden {
             &format!("backtest {:?}", self.strategy),
             native_options,
             Box::new(|_| Box::new(visualization::vis::App{
+                symbol,
                 candle_data,
                 cash_data,
+                base_line_data,
                 net_assets_data,
                 order_data
             })),
@@ -168,7 +190,7 @@ impl Golden for PaperGolden{
         todo!()
     }
 
-    fn plot(&self) {
+    fn plot(&self, symbol: String) {
         todo!()
     }
 }
@@ -204,11 +226,39 @@ impl Golden for LiveGolden {
         todo!()
     }
 
-    fn plot(&self) {
+    fn plot(&self, symbol: String) {
         todo!()
     }
 }
 
+// Top level struct to hold the TOML data.
+#[derive(Deserialize, Debug)]
+struct TomlData {
+    config: Config,
+}
+
+// Config struct holds to data from the `[config]` section.
+#[derive(Deserialize, Debug)]
+struct Config {
+    broker: String,
+    symbol: String,
+    time: String,
+    strategy: String,
+    cash: f64
+}
+
+
+pub fn parse_config() -> Result<TomlData>{
+    log::info!("start parsing config");
+    let config_data: TomlData = toml::from_str(&*fs::read_to_string("./config.toml")?)?;
+    log::info!("{:?}", config_data);
+    Ok(config_data)
+}
+
+pub fn strategy_mapping(_strategy: &str) -> BaseStrategy {
+    // TODO
+    return BaseStrategy{}
+}
 
 pub mod backtest;
 pub mod paper;

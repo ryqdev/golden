@@ -12,12 +12,12 @@ impl BaseStrategy {
         if data.close > data.open {
             Order{
                 action: Action::Buy,
-                size: 1.0
+                size: 1000.0
             }
         } else {
             Order{
                 action: Action::Sell,
-                size: 1.0
+                size: 1000.0
             }
         }
     }
