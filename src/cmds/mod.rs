@@ -63,11 +63,11 @@ impl Golden for BackTestGolden {
             let order = self.strategy.next(&bar);
             let cash = self.broker.cash.last().unwrap();
             let position = self.broker.position.last().unwrap();
-            log::info!("Cash: {:?}, Position: {:?}", cash, position);
+            log::info!("{}: Cash: {:?}, Position: {:?}", bar.date, cash, position);
             match order.action {
                 Action::Buy => {
                     log::info!("Buy: {:?}", order);
-                    if *cash < 0.0 {
+                    if *cash <= 0.0 {
                         log::error!("cash is smaller than 0. Cannot buy");
                         self.broker.cash.push(*cash);
                         self.broker.position.push(*position);
@@ -80,7 +80,7 @@ impl Golden for BackTestGolden {
                 }
                 Action::Sell => {
                     log::info!("Sell: {:?}", order);
-                    if *position < 0.0 {
+                    if *position <= 0.0 {
                         log::error!("position is smaller than 0. Cannot sell");
                         self.broker.cash.push(*cash);
                         self.broker.position.push(*position);

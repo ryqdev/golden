@@ -6,7 +6,7 @@ pub trait BaseData{}
 
 #[derive(Clone, Debug)]
 pub struct Bar {
-    pub date: OffsetDateTime,
+    pub date: String,
     pub open: f64,
     pub high: f64,
     pub low: f64,

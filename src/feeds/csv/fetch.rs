@@ -16,7 +16,7 @@ pub fn get_bar_from_csv(symbol: &str) -> Result<Vec<Bar>> {
         .map(|line| {
         let record = line?;
         Ok(Bar {
-            date: OffsetDateTime::now_utc(),
+            date: record.date,
             open: record.open,
             high: record.high,
             low: record.low,
