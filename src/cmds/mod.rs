@@ -63,18 +63,19 @@ impl Golden for BackTestGolden {
             let order = self.strategy.next(&bar);
             let cash = self.broker.cash.last().unwrap();
             let position = self.broker.position.last().unwrap();
-            log::info!("{}: Cash: {:?}, Position: {:?}", bar.date, cash, position);
+            let buying_power = (cash / bar.close / 100.0) as i64 ;
+            log::info!("{}: Cash: {:?}, Position: {:?}, Close Price: {}", bar.date, cash, position, bar.close);
             match order.action {
                 Action::Buy => {
                     log::info!("Buy: {:?}", order);
-                    if *cash <= 0.0 {
-                        log::error!("cash is smaller than 0. Cannot buy");
+                    if buying_power < 1 {
+                        log::error!("buying power is smaller than 1. Cannot buy");
                         self.broker.cash.push(*cash);
                         self.broker.position.push(*position);
                         self.broker.order.push(order);
                     } else {
-                        self.broker.cash.push(cash - order.size * bar.close);
-                        self.broker.position.push(position + order.size);
+                        self.broker.cash.push(cash - (buying_power * 100 ) as f64 * bar.close);
+                        self.broker.position.push(position + (buying_power * 100 ) as f64);
                         self.broker.order.push(order);
                     }
                 }
@@ -86,8 +87,8 @@ impl Golden for BackTestGolden {
                         self.broker.position.push(*position);
                         self.broker.order.push(order);
                     } else {
-                        self.broker.cash.push(cash + order.size * bar.close);
-                        self.broker.position.push(position - order.size);
+                        self.broker.cash.push(cash + position * bar.close);
+                        self.broker.position.push(0.0);
                         self.broker.order.push(order);
                     }
                 }
@@ -135,7 +136,7 @@ impl Golden for BackTestGolden {
 
         let alpha =  100.0 * p_h / self.broker.cash[0] - base_line_Percent;
         let color = if alpha > 0.0 {GoldenColor::GREEN} else {GoldenColor::RED};
-        log::info!("{color}Alpha: {alpha} {reset_color}");
+        log::info!("{color}Alpha: {alpha}% {reset_color}");
         self
     }
 

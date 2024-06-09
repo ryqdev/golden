@@ -3,4 +3,4 @@
 .idea
 .env
 data/*.csv
-!data/SPY_test.csv
+!tests/SPY_test.csv
