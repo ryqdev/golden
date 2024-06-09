@@ -128,6 +128,14 @@ impl Golden for BackTestGolden {
         let color = if p_h > 0.0 {GoldenColor::GREEN} else {GoldenColor::RED};
         let reset_color = GoldenColor::RESET;
         log::info!("{color}P&H: {p_h} {reset_color}");
+        log::info!("{color}P&H Percent: {}% {reset_color}", 100.0 * p_h / self.broker.cash[0]);
+
+        let base_line_Percent = 100.0 * (self.data.last().unwrap().close - self.data.first().unwrap().close) / self.data.first().unwrap().close;
+        log::info!("beta: {base_line_Percent}%");
+
+        let alpha =  100.0 * p_h / self.broker.cash[0] - base_line_Percent;
+        let color = if alpha > 0.0 {GoldenColor::GREEN} else {GoldenColor::RED};
+        log::info!("{color}Alpha: {alpha} {reset_color}");
         self
     }
 
