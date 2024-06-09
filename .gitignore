@@ -3,3 +3,4 @@
 .idea
 .env
 .data/
+!.data/SPY_test.csv
