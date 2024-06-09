@@ -2,5 +2,5 @@
 .vscode
 .idea
 .env
-.data/
+.data/*.csv
 !.data/SPY_test.csv
