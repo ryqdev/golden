@@ -50,7 +50,8 @@ cargo install golden
 golden csv --symbol SPY
 
 # backtest
-golden backtest --symbol SPY
+golden backtest # use config.toml by default
+golden backtest --config <path-to-config-file>
 
 # paper trading
 golden paper --broker ibkr

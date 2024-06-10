@@ -14,18 +14,22 @@ impl Command for BackTestCommand {
             .about("back test strategies")
             .visible_alias("b")
             .arg(
-                Arg::new("symbol")
-                    .long("symbol")
+                Arg::new("config")
+                    .long("config")
                     .value_parser(clap::value_parser!(String))
-                    .help("symbol")
+                    .help("config file path")
                     .num_args(1),
             )
     }
 
     async fn handler(m: &ArgMatches) -> Result<()> {
-        let toml_data = parse_config()?;
-        // let symbol = m.get_one::<String>("symbol").unwrap();
+        let config_file_path = match m.get_one::<String>("config") {
+            Some(c) => {c}
+            None => {"config.toml"} // config.toml by default
+        };
+        let toml_data = parse_config(config_file_path)?;
         log::info!("Backtest {:?}", toml_data);
+
         get_bar_from_yahoo(&toml_data.config.symbol, true).await?;
 
         BackTestGolden::new()

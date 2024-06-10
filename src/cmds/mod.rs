@@ -257,9 +257,9 @@ struct Config {
 }
 
 
-pub fn parse_config() -> Result<TomlData>{
-    log::info!("start parsing config");
-    let config_data: TomlData = toml::from_str(&*fs::read_to_string("./config.toml")?)?;
+pub fn parse_config(config_file_path: &str) -> Result<TomlData>{
+    log::info!("start parsing config from {config_file_path}");
+    let config_data: TomlData = toml::from_str(&*fs::read_to_string(config_file_path)?)?;
     log::info!("{:?}", config_data);
     Ok(config_data)
 }

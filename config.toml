@@ -1,8 +1,8 @@
 [config]
 broker = "Basetest"
-#symbol = "002714.SZ"
+symbol = "002714.SZ"
 #symbol = "AAPL"
-symbol = "SPY"
+#symbol = "002142.SZ"
 time = "Default"
 strategy = "Test"
 cash = 100_000
