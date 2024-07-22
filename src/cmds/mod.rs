@@ -11,7 +11,7 @@ use crate::feeds::{
     }
 };
 use crate::visualization;
-use crate::strategy::strategy::BaseStrategy;
+use crate::strategy::BaseStrategy;
 use crate::broker::backtest::backtest::Action;
 use crate::color::GoldenColor;
 use serde_derive::Deserialize;

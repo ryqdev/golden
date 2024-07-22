@@ -4,7 +4,7 @@ backtest:
 paper:
 	cargo run paper --broker ${broker}
 
-# Unfinished
+# TODO: Unfinished
 live:
 	cargo run live
 
