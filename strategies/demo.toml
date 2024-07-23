@@ -1,0 +1,12 @@
+[strategy]
+factor = "Stock Price"
+
+[ask]
+above = 0.02
+
+[bid]
+below = 0.02
+
+[size]
+ask = 1000
+bid = 1000

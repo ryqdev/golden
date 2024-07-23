@@ -60,6 +60,9 @@ impl Golden for BackTestGolden {
         log::info!("Running {:?}...", self.strategy);
 
         for bar in self.data.iter() {
+            let strategy = parse_strategy(path_to_strategy.toml)?;
+            log::info!("strategy {:?}", strategy);
+
             let order = self.strategy.next(&bar);
             let cash = self.broker.cash.last().unwrap();
             let position = self.broker.position.last().unwrap();
