@@ -1,12 +1,17 @@
+.PHONY: backtest paper live csv clean
+
 backtest:
-	cargo run backtest
+	@cargo run backtest
 
 paper:
-	cargo run paper --broker ${broker}
+	@cargo run paper --broker ${broker}
 
 # TODO: Unfinished
 live:
-	cargo run live
+	@cargo run live
 
 csv:
-	cargo run csv
+	@cargo run csv
+
+clean:
+	@cargo clean
