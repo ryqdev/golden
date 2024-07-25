@@ -61,6 +61,7 @@ golden paper --broker ibkr
 
 ## Project feature list
 
+- [ ] Redesign the architecture to support Python
 - [x] Command Line Argument Parser
 - [ ] Set configuration with a local toml file
 - [ ] Set configuration with UI
