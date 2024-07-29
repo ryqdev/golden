@@ -16,6 +16,9 @@
 //!
 //! ```
 
+
+#![deny(missing_docs)]
+
 pub mod cmds;
 pub mod feeds;
 pub mod broker;
