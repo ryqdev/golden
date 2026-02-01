@@ -105,8 +105,6 @@ golden paper --broker ibkr
 - [ ] Remote deployment
 - [ ] Multi-strategy system design
 
-
-
 ## Reference
 
 [1] https://rustmagazine.github.io/rust_magazine_2021/chapter_12/rust-perf.html
