@@ -39,8 +39,17 @@ Paper trading with IBKR TWS:
 
 
 ## Quick Install
+
+Install the published version from crates.io:
+
 ```shell
 cargo install golden
+```
+
+To install from a local checkout, run this command from the project directory:
+
+```shell
+cargo install --path .
 ```
 
 ## Useful Commands
