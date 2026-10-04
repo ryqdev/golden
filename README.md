@@ -17,26 +17,18 @@ Inspired by `backtrader`, `golden` aims to build all-in-one trading engine suppo
 - Modern programming language: Rust is the modern programming language with a powerful package manager (`cargo`) and toolchain.
 - High performance:  Well-written Rust programs can perform as well as C/C++. [1]
 
-
-
 ## Quick glance
 ### On Linux:
 Download csv data from yahoo finance:
 ![image](https://github.com/ryqdev/golden/assets/50010920/96719058-7b20-4894-a24b-84f52f21f289)
 Backtest with a simple strategy:
 ![image](https://github.com/ryqdev/golden/assets/50010920/86035e40-8203-4526-abba-c932a02553af)
-Paper trading with IBKR TWS
-![image](https://github.com/ryqdev/golden/assets/50010920/5f4e699b-ad97-4858-8626-e0c88f992567)
-
 
 ### On Windows:
 Download csv data from yahoo finance:
 ![image](https://github.com/ryqdev/golden/assets/50010920/cd49ac08-6529-473a-90fb-c645b8154498)
 Backtest with a simple strategy:
 ![image](https://github.com/ryqdev/golden/assets/50010920/e03e639e-f4e2-41fb-b25e-09f3b5156cfd)
-Paper trading with IBKR TWS:
-![image](https://github.com/ryqdev/golden/assets/50010920/9da6a5b4-5fe0-4f57-8ace-92d81d70cc9d)
-
 
 ## Quick Install
 
