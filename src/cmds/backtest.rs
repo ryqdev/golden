@@ -2,7 +2,7 @@ use super::{Command, BackTestGolden, Golden, parse_config, strategy_mapping};
 use anyhow::{Result};
 use clap::{Arg, ArgMatches, Command as ClapCommand};
 use async_trait::async_trait;
-use crate::feeds::csv::fetch::get_bar_from_yahoo;
+use crate::feeds::csv::fetch::{csv_path, get_bar_from_yahoo};
 
 pub struct BackTestCommand;
 use crate::strategy::strategy::BaseStrategy;
@@ -30,7 +30,14 @@ impl Command for BackTestCommand {
         let toml_data = parse_config(config_file_path)?;
         log::info!("Backtest {:?}", toml_data);
 
-        get_bar_from_yahoo(&toml_data.config.symbol, true).await?;
+        // Only download if there is no local data yet. Use `golden csv --symbol <symbol>` to refresh.
+        let symbol = &toml_data.config.symbol;
+        let local_csv = csv_path(symbol)?;
+        if local_csv.exists() {
+            log::info!("use local data {}, run `golden csv --symbol {symbol}` to refresh it", local_csv.display());
+        } else {
+            get_bar_from_yahoo(symbol, true).await?;
+        }
 
         BackTestGolden::new()
             .set_broker(toml_data.config.cash)

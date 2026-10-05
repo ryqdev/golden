@@ -47,10 +47,12 @@ cargo install --path .
 ## Useful Commands
 
 ```shell
-# download csv to data/
+# download csv to data/ (the directory is created if it does not exist)
 golden csv --symbol SPY
 
 # backtest
+# uses data/<symbol>.csv if it exists, otherwise downloads it first;
+# run `golden csv --symbol <symbol>` to refresh the local data
 golden backtest # use config.toml by default
 golden backtest --config <path-to-config-file>
 
